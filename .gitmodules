@@ -1,0 +1,6 @@
+[submodule "extlibs/libSDL2pp"]
+	path = extlibs/libSDL2pp
+	url = https://github.com/libSDL2pp/libSDL2pp.git
+[submodule "extlibs/GSL"]
+	path = extlibs/GSL
+	url = https://github.com/Microsoft/GSL.git
