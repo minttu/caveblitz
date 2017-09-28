@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include <gsl/gsl>
-#include <SDL2/sdl.h>
+#include <SDL2/SDL.h>
 
 #include "ServerPlayer.h"
 

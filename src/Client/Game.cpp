@@ -43,7 +43,7 @@ void Game::run() {
     auto ship = new Ship;
     ship->texture = this->load_texture("assets/ship.png");
 
-    std::map<Sint32, bool> keys_held; // everything will be initialized to false
+    std::map<Sint32, bool> keys_held;
 
     DeltaTime dt = 0.0f;
 

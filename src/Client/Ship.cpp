@@ -6,7 +6,7 @@ Ship::Ship() {
     this->rotation = 0.0f;
 }
 
-void Ship::draw(SDL2pp::Renderer *renderer, double dt) const {
+void Ship::draw(SDL2pp::Renderer *renderer, double) const {
     SDL2pp::Rect src_rect(1, 1, 32, 32);
     SDL2pp::Rect rect(
             static_cast<int>(roundf(this->x) - 16),

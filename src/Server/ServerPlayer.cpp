@@ -22,7 +22,7 @@ void ServerPlayer::update(double dt, float thrust, float rotation) {
     this->velocity *= (0.95f * 60 * dt);
 }
 
-void ServerPlayer::collide(double dt, float x, float y) {
+void ServerPlayer::collide(double, float, float) {
     this->velocity = glm::vec2(0.0f, 0.0f);
     this->position = this->previous_position;
     this->colliding = true;
