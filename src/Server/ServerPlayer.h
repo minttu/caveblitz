@@ -5,7 +5,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
-typedef uint8_t PlayerID;
+#include "../Common/DataTransfer.h"
 
 class ServerPlayer {
 public:

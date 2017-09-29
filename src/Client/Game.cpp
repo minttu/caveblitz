@@ -3,6 +3,7 @@
 #include <vector>
 #include "Game.h"
 #include "../Server/Server.h"
+#include "../Common/DataTransfer.h"
 
 Game::Game()
         : sdl(SDL_INIT_VIDEO),
@@ -16,7 +17,6 @@ Game::Game()
 }
 
 bool Game::initialize() {
-
     return true;
 }
 
@@ -44,11 +44,19 @@ void Game::run() {
     auto ship = std::make_unique<Ship>(Ship());
     ship->texture = this->load_texture("assets/ship.png");
 
-    std::map<Sint32, bool> keys_held;
+    auto input_data = std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>());
+    input_data->reserve(1024);
 
+    auto response_data = std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>());
+    response_data->reserve(1024);
+
+    std::map<Sint32, bool> keys_held;
     DeltaTime dt = 0.0f;
 
     while (this->running) {
+        input_data->clear();
+        response_data->clear();
+
         PlayerInput input{};
         input.player_id = player_id;
         input.rotation = 0;
@@ -82,7 +90,6 @@ void Game::run() {
         if (keys_held[SDLK_DOWN])
             input.flags |= PLAYER_INPUT_SECONDARY_USE;
 
-        auto input_data = std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>());
         input.serialize(input_data);
 
         server->handle_input(input_data);
@@ -90,18 +97,24 @@ void Game::run() {
         this->renderer.SetDrawColor(100, 149, 237);
         this->renderer.Clear();
 
-        auto response = server->update(dt);
+        server->update(dt);
+        server->serialize(response_data);
 
         bool good;
         gsl::span<uint8_t> span;
         PlayerUpdate update{};
 
         uint32_t offset = 0;
-        while (response->size() > offset) {
-            uint8_t type = (*response)[offset];
+        while (response_data->size() > offset) {
+            uint8_t type = (*response_data)[offset];
+            if (type >= sizeof(RESPONSE_DATA_SIZES) / sizeof(RESPONSE_DATA_SIZES[0])) {
+                SDL_Log("Bad response type");
+                break;
+            }
+
             switch (type) {
                 case PLAYER_UPDATE:
-                    span = gsl::make_span(response->data() + offset, RESPONSE_DATA_SIZES[type] + 1);
+                    span = gsl::make_span(response_data->data() + offset, RESPONSE_DATA_SIZES[type] + 1);
                     good = update.deserialize(span);
                     if (good) {
                         ship->x = update.x;

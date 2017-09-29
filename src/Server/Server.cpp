@@ -29,6 +29,11 @@ bool Server::handle_input(std::shared_ptr<std::vector<uint8_t>> &data) {
     uint32_t offset = 0;
     while (data->size() > offset) {
         uint8_t type = (*data)[offset];
+        if (type >= sizeof(INPUT_DATA_SIZES) / sizeof(INPUT_DATA_SIZES[0])) {
+            SDL_Log("Bad input type");
+            return false;
+        }
+
         switch (type) {
             case PLAYER_INPUT:
                 span = gsl::make_span(data->data() + offset, INPUT_DATA_SIZES[type] + 1);
@@ -62,7 +67,7 @@ bool Server::handle_player_input(PlayerInput input) {
     return true;
 }
 
-std::shared_ptr<std::vector<uint8_t>> Server::update(double dt) {
+void Server::update(double dt) {
     for (auto const &x : this->players) {
         auto id = x.first;
         auto player = x.second;
@@ -81,9 +86,11 @@ std::shared_ptr<std::vector<uint8_t>> Server::update(double dt) {
             continue;
         }
     }
-    this->player_inputs.clear();
 
-    auto target = std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>());
+    this->player_inputs.clear();
+}
+
+void Server::serialize(std::shared_ptr<std::vector<uint8_t>> &target) {
     PlayerUpdate player_update{};
 
     for (auto const &x : this->players) {
@@ -96,6 +103,4 @@ std::shared_ptr<std::vector<uint8_t>> Server::update(double dt) {
 
         player_update.serialize(target);
     }
-
-    return target;
 }
