@@ -140,7 +140,7 @@ typedef struct GameUpdate {
 
 class Server {
 private:
-    std::map<PlayerID, ServerPlayer *> players;
+    std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
     std::map<PlayerID, PlayerInput> player_inputs;
 public:
     Server();

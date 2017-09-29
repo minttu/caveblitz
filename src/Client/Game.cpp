@@ -37,10 +37,11 @@ void Game::run() {
 
     SDL_Event e{};
 
-    auto server = new Server;
+    auto server = std::make_unique<Server>(Server());
 
     PlayerID player_id = server->join_server();
-    auto ship = new Ship;
+
+    auto ship = std::make_unique<Ship>(Ship());
     ship->texture = this->load_texture("assets/ship.png");
 
     std::map<Sint32, bool> keys_held;

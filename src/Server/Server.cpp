@@ -11,7 +11,7 @@ PlayerID Server::join_server() {
         return 255;
     }
     auto id = static_cast<PlayerID>(this->players.size() + 1);
-    auto player = new ServerPlayer(id);
+    auto player = std::make_shared<ServerPlayer>(ServerPlayer(id));
     this->players[id] = player;
 
     return id;
@@ -87,7 +87,7 @@ std::shared_ptr<std::vector<uint8_t>> Server::update(double dt) {
     PlayerUpdate player_update{};
 
     for (auto const &x : this->players) {
-        ServerPlayer *player = x.second;
+        auto player = x.second;
         player_update.player_id = player->player_id;
         player_update.x = player->position.x;
         player_update.y = player->position.y;

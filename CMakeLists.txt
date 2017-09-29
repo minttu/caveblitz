@@ -3,12 +3,15 @@ PROJECT(caveblitz)
 
 SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Winit-self -Woverloaded-virtual -Wuninitialized -Wmissing-declarations -pedantic")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++ -g")
+
+IF(WIN32)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
+ENDIF()
 
 SET(SDL2PP_WITH_IMAGE ON)
 SET(SDL2PP_WITH_MIXER ON)
 SET(SDL2PP_WITH_TTF ON)
-SET(SDL2PP_STATIC FALSE)
+SET(SDL2PP_STATIC OFF)
 ADD_SUBDIRECTORY(extlibs/libSDL2pp)
 
 INCLUDE(FindPkgConfig)
