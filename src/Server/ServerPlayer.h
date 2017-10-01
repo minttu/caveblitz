@@ -1,9 +1,9 @@
 #ifndef CAVEBLITZ_SERVER_PLAYER_H
 #define CAVEBLITZ_SERVER_PLAYER_H
 
-#include <glm/vec2.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/vec2.hpp>
 
 #include "../Common/DataTransfer.h"
 
@@ -24,5 +24,4 @@ public:
     void collide(double dt, float x, float y);
 };
 
-
-#endif //CAVEBLITZ_SERVER_PLAYER_H
+#endif // CAVEBLITZ_SERVER_PLAYER_H

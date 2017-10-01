@@ -1,17 +1,17 @@
 #ifndef CAVEBLITZ_GAME_H
 #define CAVEBLITZ_GAME_H
 
-#include <memory>
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#include <SDL2pp/SDL.hh>
-#include <SDL2pp/Window.hh>
 #include <SDL2pp/Renderer.hh>
+#include <SDL2pp/SDL.hh>
 #include <SDL2pp/Texture.hh>
+#include <SDL2pp/Window.hh>
 
 #include "FPSManager.h"
 #include "Ship.h"
@@ -43,5 +43,4 @@ public:
     ~Game();
 };
 
-
-#endif //CAVEBLITZ_GAME_H
+#endif // CAVEBLITZ_GAME_H

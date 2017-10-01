@@ -14,7 +14,8 @@ void ServerPlayer::update(double dt, float thrust, float rotation) {
     this->previous_position = this->position;
 
     this->rotation -= rotation * 90 * dt;
-    this->velocity += glm::rotate(glm::vec2(0.0f, -thrust * dt), this->rotation * glm::pi<float>() / 180);
+    this->velocity +=
+            glm::rotate(glm::vec2(0.0f, -thrust * dt), this->rotation * glm::pi<float>() / 180);
     if (!this->colliding) {
         this->position += this->velocity * this->speed;
     }

@@ -34,15 +34,15 @@ bool Server::handle_input(std::shared_ptr<std::vector<uint8_t>> &data) {
         auto span = target.subspan(offset, offset + size);
 
         switch (type) {
-            case PLAYER_INPUT:
-                if (!input.deserialize(span)) {
-                    return false;
-                }
-                this->handle_player_input(input);
-
-                break;
-            default:
+        case PLAYER_INPUT:
+            if (!input.deserialize(span)) {
                 return false;
+            }
+            this->handle_player_input(input);
+
+            break;
+        default:
+            return false;
         }
 
         offset += size;
@@ -77,7 +77,9 @@ void Server::update(double dt) {
         try {
             auto input = this->player_inputs.at(id);
 
-            player->update(dt, static_cast<float>(input.thrust) / 128, static_cast<float>(input.rotation) / 128);
+            player->update(dt,
+                           static_cast<float>(input.thrust) / 128,
+                           static_cast<float>(input.rotation) / 128);
         } catch (const std::out_of_range &oor) {
             continue;
         }

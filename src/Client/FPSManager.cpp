@@ -16,7 +16,8 @@ DeltaTime FPSManager::delay() {
     uint32_t current_ticks = SDL_GetTicks();
     DeltaTime time_passed = static_cast<float>(current_ticks - this->last_ticks) / 1000.0f;
     this->last_ticks = current_ticks;
-    uint32_t target_ticks = this->base_ticks + static_cast<uint32_t>(this->frame_count * this->rate_ticks);
+    uint32_t target_ticks =
+            this->base_ticks + static_cast<uint32_t>(this->frame_count * this->rate_ticks);
 
     if (current_ticks <= target_ticks) {
         SDL_Delay(target_ticks - current_ticks);

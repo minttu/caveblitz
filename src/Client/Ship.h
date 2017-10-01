@@ -23,5 +23,4 @@ public:
     void draw(SDL2pp::Renderer *renderer, double dt) const;
 };
 
-
-#endif //CAVEBLITZ_SHIP_H
+#endif // CAVEBLITZ_SHIP_H

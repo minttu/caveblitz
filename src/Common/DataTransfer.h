@@ -1,9 +1,9 @@
 #ifndef CAVEBLITZ_DATA_TRANSFER_H
 #define CAVEBLITZ_DATA_TRANSFER_H
 
+#include <gsl/gsl>
 #include <memory>
 #include <vector>
-#include <gsl/gsl>
 
 union FloatBytes {
     float f;
@@ -22,18 +22,11 @@ union FloatBytes {
     }
 };
 
-enum PlayerInputFlags {
-    PLAYER_INPUT_PRIMARY_USE = 0x01,
-    PLAYER_INPUT_SECONDARY_USE = 0x02
-};
+enum PlayerInputFlags { PLAYER_INPUT_PRIMARY_USE = 0x01, PLAYER_INPUT_SECONDARY_USE = 0x02 };
 
-enum InputDataType : uint8_t {
-    PLAYER_INPUT = 1
-};
+enum InputDataType : uint8_t { PLAYER_INPUT = 1 };
 
-const uint8_t INPUT_DATA_SIZES[255] = {
-        0, 4
-};
+const uint8_t INPUT_DATA_SIZES[255] = {0, 4};
 
 typedef uint8_t PlayerID;
 
@@ -44,10 +37,10 @@ typedef struct PlayerInput {
     std::uint8_t flags;
 
     void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
-        target->push_back((uint8_t) PLAYER_INPUT);
+        target->push_back((uint8_t)PLAYER_INPUT);
         target->push_back(player_id);
-        target->push_back((uint8_t) thrust);
-        target->push_back((uint8_t) rotation);
+        target->push_back((uint8_t)thrust);
+        target->push_back((uint8_t)rotation);
         target->push_back(flags);
     }
 
@@ -66,21 +59,16 @@ typedef struct PlayerInput {
 
 } PlayerInput;
 
-enum ResponseDataType : uint8_t {
-    PLAYER_UPDATE = 1,
-    SERVER_UPDATE = 2
-};
+enum ResponseDataType : uint8_t { PLAYER_UPDATE = 1, SERVER_UPDATE = 2 };
 
-const uint8_t RESPONSE_DATA_SIZES[255] = {
-        0, 14, 8
-};
+const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8};
 
 typedef struct ServerUpdate {
     uint32_t frame;
     uint32_t delta_ticks;
 
     void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
-        target->push_back((uint8_t) SERVER_UPDATE);
+        target->push_back((uint8_t)SERVER_UPDATE);
 
         FloatBytes data{};
         data.i = frame;
@@ -108,7 +96,7 @@ typedef struct PlayerUpdate {
     float rotation;
 
     void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
-        target->push_back((uint8_t) PLAYER_UPDATE);
+        target->push_back((uint8_t)PLAYER_UPDATE);
         target->push_back(player_id);
         target->push_back(health);
         FloatBytes data{};

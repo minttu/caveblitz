@@ -9,12 +9,10 @@ Ship::Ship() {
 
 void Ship::draw(SDL2pp::Renderer *renderer, double /*unused*/) const {
     SDL2pp::Rect src_rect(1, 1, 32, 32);
-    SDL2pp::Rect rect(
-            static_cast<int>(roundf(this->x) - 16),
-            static_cast<int>(roundf(this->y) - 16),
-            32,
-            32
-    );
+    SDL2pp::Rect rect(static_cast<int>(roundf(this->x) - 16),
+                      static_cast<int>(roundf(this->y) - 16),
+                      32,
+                      32);
 
     this->texture->SetBlendMode(SDL_BLENDMODE_BLEND);
     this->texture->SetColorMod(this->color.r, this->color.g, this->color.b);
@@ -22,12 +20,10 @@ void Ship::draw(SDL2pp::Renderer *renderer, double /*unused*/) const {
 
     const int dot_size = 2;
     SDL2pp::Rect dot_src_rect(16, 16, dot_size, dot_size);
-    SDL2pp::Rect dot_dst_rect(
-            static_cast<int>(roundf(this->x) - 1),
-            static_cast<int>(roundf(this->y) - 1),
-            dot_size,
-            dot_size
-    );
+    SDL2pp::Rect dot_dst_rect(static_cast<int>(roundf(this->x) - 1),
+                              static_cast<int>(roundf(this->y) - 1),
+                              dot_size,
+                              dot_size);
 
     this->texture->SetColorMod(255, 255, 255);
     renderer->Copy(*this->texture, dot_src_rect, dot_dst_rect);

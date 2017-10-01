@@ -1,7 +1,6 @@
 #ifndef CAVEBLITZ_FPSMANAGER_H
 #define CAVEBLITZ_FPSMANAGER_H
 
-
 #include <cstdint>
 
 typedef float DeltaTime;
@@ -19,5 +18,4 @@ public:
     DeltaTime delay();
 };
 
-
-#endif //CAVEBLITZ_FPSMANAGER_H
+#endif // CAVEBLITZ_FPSMANAGER_H

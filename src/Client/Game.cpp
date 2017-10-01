@@ -8,7 +8,12 @@
 
 Game::Game()
         : sdl(SDL_INIT_VIDEO),
-          window("CaveBlitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN),
+          window("CaveBlitz",
+                 SDL_WINDOWPOS_UNDEFINED,
+                 SDL_WINDOWPOS_UNDEFINED,
+                 640,
+                 480,
+                 SDL_WINDOW_SHOWN),
           renderer(window, -1, SDL_RENDERER_ACCELERATED),
           _target(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())),
           running(false) {
@@ -127,16 +132,16 @@ void Game::handle_update() {
 
         auto span = target.subspan(offset, offset + size);
 
-        switch(type) {
-            case PLAYER_UPDATE:
-                if (!player_update.deserialize(span)) {
-                    break;
-                }
+        switch (type) {
+        case PLAYER_UPDATE:
+            if (!player_update.deserialize(span)) {
+                break;
+            }
 
-                this->handle_player_update(player_update);
-                break;
-            default:
-                break;
+            this->handle_player_update(player_update);
+            break;
+        default:
+            break;
         }
 
         offset += size;
@@ -156,6 +161,5 @@ void Game::handle_player_update(PlayerUpdate pu) {
     ship->y = pu.y;
     ship->rotation = pu.rotation;
 }
-
 
 Game::~Game() = default;
