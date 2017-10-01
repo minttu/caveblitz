@@ -47,23 +47,6 @@ TARGET_COMPILE_DEFINITIONS(
     GLM_ENABLE_EXPERIMENTAL=1
 )
 
-FIND_PROGRAM(
-    CLANG_TIDY_EXE
-    NAMES "clang-tidy"
-    DOC "Path to clang-tidy executable"
-)
-
-IF(NOT CLANG_TIDY_EXE)
-    MESSAGE(STATUS "clang-tidy not found.")
-ELSE()
-    MESSAGE(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-    SET(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=*,-clang-analyzer-alpha.*")
-    SET_TARGET_PROPERTIES(
-        caveblitz PROPERTIES
-        CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
-    )
-ENDIF()
-
 ADD_CUSTOM_TARGET(
     TARGET caveblitz PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory

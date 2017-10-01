@@ -15,8 +15,7 @@ Game::Game()
                  480,
                  SDL_WINDOW_SHOWN),
           renderer(window, -1, SDL_RENDERER_ACCELERATED),
-          _target(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())),
-          running(false) {
+          _target(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())) {
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 
     SDL2pp::Surface icon("assets/icon.png");
@@ -161,5 +160,3 @@ void Game::handle_player_update(PlayerUpdate pu) {
     ship->y = pu.y;
     ship->rotation = pu.rotation;
 }
-
-Game::~Game() = default;

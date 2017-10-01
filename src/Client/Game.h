@@ -27,7 +27,7 @@ private:
     std::map<const char *, std::shared_ptr<SDL2pp::Texture>> textures;
     std::map<PlayerID, std::shared_ptr<Ship>> ships;
     std::shared_ptr<std::vector<uint8_t>> _target;
-    bool running;
+    bool running{false};
 
 public:
     Game();
@@ -39,8 +39,6 @@ public:
     void handle_update();
 
     void handle_player_update(PlayerUpdate pu);
-
-    ~Game();
 };
 
 #endif // CAVEBLITZ_GAME_H

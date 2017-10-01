@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-typedef float DeltaTime;
+using DeltaTime = float;
 
 class FPSManager {
 public:

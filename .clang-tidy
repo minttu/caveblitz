@@ -1,0 +1,4 @@
+---
+Checks: '*,-llvm*,-cppcoreguidelines-pro-type-union-access'
+WarningsAsErrors: ''
+AnalyzeTemporaryDtors: false

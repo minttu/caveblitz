@@ -22,10 +22,10 @@ public:
 
     PlayerID join_server();
 
-    bool handle_input(std::shared_ptr<std::vector<uint8_t>> &data);
+    bool handle_input(const std::shared_ptr<std::vector<uint8_t>> &data);
 
     void update(double dt);
-    void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const;
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const;
 };
 
 #endif // CAVEBLITZ_SERVER_H

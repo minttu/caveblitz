@@ -10,15 +10,15 @@ union FloatBytes {
     uint32_t i;
     uint8_t b[4];
 
-    inline void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
+    inline void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
         target->push_back(b[0]);
         target->push_back(b[1]);
         target->push_back(b[2]);
         target->push_back(b[3]);
     }
 
-    inline void deserialize(gsl::span<uint8_t> &target, uint32_t offset) {
-        memcpy(b, target.data() + offset, 4);
+    inline void deserialize(const gsl::span<uint8_t> &target, uint32_t offset) {
+        memcpy(&b, target.data() + offset, 4);
     }
 };
 
@@ -28,23 +28,23 @@ enum InputDataType : uint8_t { PLAYER_INPUT = 1 };
 
 const uint8_t INPUT_DATA_SIZES[255] = {0, 4};
 
-typedef uint8_t PlayerID;
+using PlayerID = uint8_t;
 
-typedef struct PlayerInput {
+struct PlayerInput {
     PlayerID player_id;
     std::int8_t thrust;
     std::int8_t rotation;
     std::uint8_t flags;
 
-    void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
-        target->push_back((uint8_t)PLAYER_INPUT);
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(PLAYER_INPUT));
         target->push_back(player_id);
-        target->push_back((uint8_t)thrust);
-        target->push_back((uint8_t)rotation);
+        target->push_back(static_cast<uint8_t>(thrust));
+        target->push_back(static_cast<uint8_t>(rotation));
         target->push_back(flags);
     }
 
-    bool deserialize(gsl::span<uint8_t> &target) {
+    bool deserialize(const gsl::span<uint8_t> &target) {
         if (target.size() != INPUT_DATA_SIZES[PLAYER_INPUT] + 1 || target[0] != PLAYER_INPUT) {
             return false;
         }
@@ -57,18 +57,19 @@ typedef struct PlayerInput {
         return true;
     }
 
-} PlayerInput;
+};
+using PlayerInput = struct PlayerInput;
 
 enum ResponseDataType : uint8_t { PLAYER_UPDATE = 1, SERVER_UPDATE = 2 };
 
 const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8};
 
-typedef struct ServerUpdate {
+struct ServerUpdate {
     uint32_t frame;
     uint32_t delta_ticks;
 
-    void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
-        target->push_back((uint8_t)SERVER_UPDATE);
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(SERVER_UPDATE));
 
         FloatBytes data{};
         data.i = frame;
@@ -77,26 +78,25 @@ typedef struct ServerUpdate {
         data.serialize(target);
     }
 
-    void deserialize(gsl::span<uint8_t> &target) {
-        assert(target[0] == SERVER_UPDATE);
-
+    void deserialize(const gsl::span<uint8_t> &target) {
         FloatBytes data{};
         data.deserialize(target, 1);
         frame = data.i;
         data.deserialize(target, 5);
         delta_ticks = data.i;
     }
-} ServerUpdate;
+};
+using ServerUpdate = struct ServerUpdate;
 
-typedef struct PlayerUpdate {
+struct PlayerUpdate {
     PlayerID player_id;
     uint8_t health;
     float x;
     float y;
     float rotation;
 
-    void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
-        target->push_back((uint8_t)PLAYER_UPDATE);
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(PLAYER_UPDATE));
         target->push_back(player_id);
         target->push_back(health);
         FloatBytes data{};
@@ -108,7 +108,7 @@ typedef struct PlayerUpdate {
         data.serialize(target);
     }
 
-    bool deserialize(gsl::span<uint8_t> &target) {
+    bool deserialize(const gsl::span<uint8_t> &target) {
         if (target.size() != RESPONSE_DATA_SIZES[PLAYER_UPDATE] + 1 || target[0] != PLAYER_UPDATE) {
             return false;
         }
@@ -125,6 +125,7 @@ typedef struct PlayerUpdate {
 
         return true;
     }
-} PlayerUpdate;
+};
+using PlayerUpdate = struct PlayerUpdate;
 
 #endif // CAVEBLITZ_DATA_TRANSFER_h

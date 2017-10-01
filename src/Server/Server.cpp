@@ -15,7 +15,7 @@ PlayerID Server::join_server() {
     return id;
 }
 
-bool Server::handle_input(std::shared_ptr<std::vector<uint8_t>> &data) {
+bool Server::handle_input(const std::shared_ptr<std::vector<uint8_t>> &data) {
     if (data->empty()) {
         return true;
     }
@@ -88,7 +88,7 @@ void Server::update(double dt) {
     this->player_inputs.clear();
 }
 
-void Server::serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
+void Server::serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
     PlayerUpdate player_update{};
 
     for (auto const &x : this->players) {
