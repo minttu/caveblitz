@@ -1,4 +1,5 @@
 #include <SDL2/SDL_timer.h>
+
 #include "FPSManager.h"
 
 FPSManager::FPSManager() {

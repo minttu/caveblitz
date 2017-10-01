@@ -2,9 +2,7 @@
 
 const int MAX_PLAYERS = 4;
 
-Server::Server() {
-
-}
+Server::Server() = default;
 
 PlayerID Server::join_server() {
     if (this->players.size() >= MAX_PLAYERS) {
@@ -22,34 +20,32 @@ bool Server::handle_input(std::shared_ptr<std::vector<uint8_t>> &data) {
         return true;
     }
 
-    bool good;
-    gsl::span<uint8_t> span;
     PlayerInput input{};
+    std::ptrdiff_t offset = 0;
+    gsl::span<uint8_t> target(data->data(), data->size());
 
-    uint32_t offset = 0;
-    while (data->size() > offset) {
-        uint8_t type = (*data)[offset];
+    while (offset < target.size()) {
+        uint8_t type = target[offset];
         if (type >= sizeof(INPUT_DATA_SIZES) / sizeof(INPUT_DATA_SIZES[0])) {
-            SDL_Log("Bad input type");
             return false;
         }
 
+        auto size = gsl::at(INPUT_DATA_SIZES, type) + 1;
+        auto span = target.subspan(offset, offset + size);
+
         switch (type) {
             case PLAYER_INPUT:
-                span = gsl::make_span(data->data() + offset, INPUT_DATA_SIZES[type] + 1);
-                good = input.deserialize(span);
-                if (good) {
-                    this->handle_player_input(input);
-                } else {
+                if (!input.deserialize(span)) {
                     return false;
                 }
+                this->handle_player_input(input);
+
                 break;
             default:
-                SDL_Log("Default %d", type);
                 return false;
         }
 
-        offset += INPUT_DATA_SIZES[type] + 1;
+        offset += size;
     }
 
     return true;

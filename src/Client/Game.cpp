@@ -1,9 +1,10 @@
 #include <memory>
 #include <sstream>
 #include <vector>
-#include "Game.h"
-#include "../Server/Server.h"
+
 #include "../Common/DataTransfer.h"
+#include "../Server/Server.h"
+#include "Game.h"
 
 Game::Game()
         : sdl(SDL_INIT_VIDEO),
@@ -68,20 +69,25 @@ void Game::run() {
             }
         }
 
-        if (keys_held[SDLK_UP])
+        if (keys_held[SDLK_UP]) {
             input.thrust += 127;
+        }
 
-        if (keys_held[SDLK_RIGHT])
+        if (keys_held[SDLK_RIGHT]) {
             input.rotation -= 127;
+        }
 
-        if (keys_held[SDLK_LEFT])
+        if (keys_held[SDLK_LEFT]) {
             input.rotation += 127;
+        }
 
-        if (keys_held[SDLK_RSHIFT])
+        if (keys_held[SDLK_RSHIFT]) {
             input.flags |= PLAYER_INPUT_PRIMARY_USE;
+        }
 
-        if (keys_held[SDLK_DOWN])
+        if (keys_held[SDLK_DOWN]) {
             input.flags |= PLAYER_INPUT_SECONDARY_USE;
+        }
 
         input.serialize(input_data);
 
@@ -103,28 +109,29 @@ void Game::run() {
 }
 
 void Game::handle_update() {
-    uint32_t offset = 0;
-    gsl::span<uint8_t> span;
+    gsl::span<uint8_t> target(this->_target->data(), this->_target->size());
+    std::ptrdiff_t offset = 0;
 
     PlayerUpdate player_update{};
 
-    while (offset < this->_target->size()) {
-        auto type = (*this->_target)[offset];
+    while (offset < target.size()) {
+        auto type = target[offset];
         if (type >= sizeof(RESPONSE_DATA_SIZES) / sizeof(RESPONSE_DATA_SIZES[0])) {
             break;
         }
 
-        auto size = RESPONSE_DATA_SIZES[type] + 1;
+        auto size = gsl::at(RESPONSE_DATA_SIZES, type) + 1;
         if (size == 1) {
             break;
         }
 
-        span = gsl::make_span(this->_target->data() + offset, size);
+        auto span = target.subspan(offset, offset + size);
 
         switch(type) {
             case PLAYER_UPDATE:
-                if (!player_update.deserialize(span))
+                if (!player_update.deserialize(span)) {
                     break;
+                }
 
                 this->handle_player_update(player_update);
                 break;

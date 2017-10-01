@@ -16,7 +16,7 @@ public:
     float x;
     float y;
     float rotation;
-    Sint32 color;
+    SDL2pp::Color color;
 
     Ship();
 
