@@ -16,6 +16,8 @@
 #include "FPSManager.h"
 #include "Ship.h"
 
+#include "../Common/DataTransfer.h"
+
 class Game {
 private:
     SDL2pp::SDL sdl;
@@ -23,16 +25,20 @@ private:
     SDL2pp::Renderer renderer;
     FPSManager fps_manager;
     std::map<const char *, std::shared_ptr<SDL2pp::Texture>> textures;
+    std::map<PlayerID, std::shared_ptr<Ship>> ships;
+    std::shared_ptr<std::vector<uint8_t>> _target;
     bool running;
 
 public:
     Game();
 
-    bool initialize();
-
     std::shared_ptr<SDL2pp::Texture> load_texture(const char *path);
 
     void run();
+
+    void handle_update();
+
+    void handle_player_update(PlayerUpdate pu);
 
     ~Game();
 };

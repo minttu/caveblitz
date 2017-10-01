@@ -9,15 +9,12 @@ Game::Game()
         : sdl(SDL_INIT_VIDEO),
           window("CaveBlitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN),
           renderer(window, -1, SDL_RENDERER_ACCELERATED),
+          _target(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())),
           running(false) {
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 
     SDL2pp::Surface icon("assets/icon.png");
     this->window.SetIcon(icon);
-}
-
-bool Game::initialize() {
-    return true;
 }
 
 std::shared_ptr<SDL2pp::Texture> Game::load_texture(const char *path) {
@@ -40,22 +37,18 @@ void Game::run() {
     auto server = std::make_unique<Server>(Server());
 
     PlayerID player_id = server->join_server();
-
-    auto ship = std::make_unique<Ship>(Ship());
+    auto ship = std::make_shared<Ship>(Ship());
+    this->ships[player_id] = ship;
     ship->texture = this->load_texture("assets/ship.png");
 
     auto input_data = std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>());
     input_data->reserve(1024);
-
-    auto response_data = std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>());
-    response_data->reserve(1024);
 
     std::map<Sint32, bool> keys_held;
     DeltaTime dt = 0.0f;
 
     while (this->running) {
         input_data->clear();
-        response_data->clear();
 
         PlayerInput input{};
         input.player_id = player_id;
@@ -98,40 +91,8 @@ void Game::run() {
         this->renderer.Clear();
 
         server->update(dt);
-        server->serialize(response_data);
-
-        bool good;
-        gsl::span<uint8_t> span;
-        PlayerUpdate update{};
-
-        uint32_t offset = 0;
-        while (response_data->size() > offset) {
-            uint8_t type = (*response_data)[offset];
-            if (type >= sizeof(RESPONSE_DATA_SIZES) / sizeof(RESPONSE_DATA_SIZES[0])) {
-                SDL_Log("Bad response type");
-                break;
-            }
-
-            switch (type) {
-                case PLAYER_UPDATE:
-                    span = gsl::make_span(response_data->data() + offset, RESPONSE_DATA_SIZES[type] + 1);
-                    good = update.deserialize(span);
-                    if (good) {
-                        ship->x = update.x;
-                        ship->y = update.y;
-                        ship->rotation = update.rotation;
-                    }
-                    break;
-                default:
-                    good = false;
-                    break;
-            }
-            if (!good) {
-                break;
-            }
-
-            offset += RESPONSE_DATA_SIZES[type] + 1;
-        }
+        server->serialize(this->_target);
+        this->handle_update();
 
         ship->draw(&this->renderer, dt);
 
@@ -140,5 +101,54 @@ void Game::run() {
         dt = this->fps_manager.delay();
     }
 }
+
+void Game::handle_update() {
+    uint32_t offset = 0;
+    gsl::span<uint8_t> span;
+
+    PlayerUpdate player_update{};
+
+    while (offset < this->_target->size()) {
+        auto type = (*this->_target)[offset];
+        if (type >= sizeof(RESPONSE_DATA_SIZES) / sizeof(RESPONSE_DATA_SIZES[0])) {
+            break;
+        }
+
+        auto size = RESPONSE_DATA_SIZES[type] + 1;
+        if (size == 1) {
+            break;
+        }
+
+        span = gsl::make_span(this->_target->data() + offset, size);
+
+        switch(type) {
+            case PLAYER_UPDATE:
+                if (!player_update.deserialize(span))
+                    break;
+
+                this->handle_player_update(player_update);
+                break;
+            default:
+                break;
+        }
+
+        offset += size;
+    }
+
+    this->_target->clear();
+}
+
+void Game::handle_player_update(PlayerUpdate pu) {
+    if (this->ships.find(pu.player_id) == this->ships.end()) {
+        return;
+    }
+
+    auto ship = this->ships[pu.player_id];
+
+    ship->x = pu.x;
+    ship->y = pu.y;
+    ship->rotation = pu.rotation;
+}
+
 
 Game::~Game() = default;

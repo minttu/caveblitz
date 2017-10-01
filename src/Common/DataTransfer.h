@@ -7,7 +7,19 @@
 
 union FloatBytes {
     float f;
+    uint32_t i;
     uint8_t b[4];
+
+    inline void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(b[0]);
+        target->push_back(b[1]);
+        target->push_back(b[2]);
+        target->push_back(b[3]);
+    }
+
+    inline void deserialize(gsl::span<uint8_t> &target, uint32_t offset) {
+        memcpy(b, target.data() + offset, 4);
+    }
 };
 
 enum PlayerInputFlags {
@@ -55,12 +67,38 @@ typedef struct PlayerInput {
 } PlayerInput;
 
 enum ResponseDataType : uint8_t {
-    PLAYER_UPDATE = 1
+    PLAYER_UPDATE = 1,
+    SERVER_UPDATE = 2
 };
 
 const uint8_t RESPONSE_DATA_SIZES[255] = {
-        0, 14
+        0, 14, 8
 };
+
+typedef struct ServerUpdate {
+    uint32_t frame;
+    uint32_t delta_ticks;
+
+    void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back((uint8_t) SERVER_UPDATE);
+
+        FloatBytes data{};
+        data.i = frame;
+        data.serialize(target);
+        data.i = delta_ticks;
+        data.serialize(target);
+    }
+
+    void deserialize(gsl::span<uint8_t> &target) {
+        assert(target[0] == SERVER_UPDATE);
+
+        FloatBytes data{};
+        data.deserialize(target, 1);
+        frame = data.i;
+        data.deserialize(target, 5);
+        delta_ticks = data.i;
+    }
+} ServerUpdate;
 
 typedef struct PlayerUpdate {
     PlayerID player_id;
@@ -75,20 +113,11 @@ typedef struct PlayerUpdate {
         target->push_back(health);
         FloatBytes data{};
         data.f = x;
-        target->push_back(data.b[0]);
-        target->push_back(data.b[1]);
-        target->push_back(data.b[2]);
-        target->push_back(data.b[3]);
+        data.serialize(target);
         data.f = y;
-        target->push_back(data.b[0]);
-        target->push_back(data.b[1]);
-        target->push_back(data.b[2]);
-        target->push_back(data.b[3]);
+        data.serialize(target);
         data.f = rotation;
-        target->push_back(data.b[0]);
-        target->push_back(data.b[1]);
-        target->push_back(data.b[2]);
-        target->push_back(data.b[3]);
+        data.serialize(target);
     }
 
     bool deserialize(gsl::span<uint8_t> &target) {
@@ -99,11 +128,11 @@ typedef struct PlayerUpdate {
         player_id = target[1];
         health = target[2];
         FloatBytes data{};
-        memcpy(data.b, target.data() + 3, 4);
+        data.deserialize(target, 3);
         x = data.f;
-        memcpy(data.b, target.data() + 7, 4);
+        data.deserialize(target, 7);
         y = data.f;
-        memcpy(data.b, target.data() + 11, 4);
+        data.deserialize(target, 11);
         rotation = data.f;
 
         return true;

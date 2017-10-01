@@ -24,7 +24,17 @@ INCLUDE_DIRECTORIES(
         ${CMAKE_CURRENT_LIST_DIR}/extlibs/glm
 )
 
-SET(SOURCE_FILES src/main.cpp src/Server/Server.cpp src/Server/Server.h src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h src/Client/Game.cpp src/Client/Game.h src/Client/Ship.cpp src/Client/Ship.h src/Client/FPSManager.cpp src/Client/FPSManager.h)
+SET(
+        SOURCE_FILES
+        src/main.cpp
+        src/Server/Server.cpp src/Server/Server.h
+        src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h
+        src/Client/Game.cpp src/Client/Game.h
+        src/Client/Ship.cpp src/Client/Ship.h
+        src/Client/FPSManager.cpp src/Client/FPSManager.h
+        src/Common/DataTransfer.h
+)
+
 ADD_EXECUTABLE(caveblitz ${SOURCE_FILES})
 TARGET_LINK_LIBRARIES(
         caveblitz

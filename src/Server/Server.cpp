@@ -90,7 +90,7 @@ void Server::update(double dt) {
     this->player_inputs.clear();
 }
 
-void Server::serialize(std::shared_ptr<std::vector<uint8_t>> &target) {
+void Server::serialize(std::shared_ptr<std::vector<uint8_t>> &target) const {
     PlayerUpdate player_update{};
 
     for (auto const &x : this->players) {

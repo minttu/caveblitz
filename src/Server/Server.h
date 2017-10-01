@@ -24,7 +24,7 @@ public:
     bool handle_input(std::shared_ptr<std::vector<uint8_t>> &data);
 
     void update(double dt);
-    void serialize(std::shared_ptr<std::vector<uint8_t>> &target);
+    void serialize(std::shared_ptr<std::vector<uint8_t>> &target) const;
 };
 
 
