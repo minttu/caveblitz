@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+import os
+import glob
+import shutil
+import tempfile
+import subprocess
+
+root_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+src_dir = os.path.join(root_dir, 'src')
+build_dir = tempfile.mkdtemp(suffix='_cmake_build')
+
+subprocess.run(
+    ['cmake', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON', root_dir],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    cwd=build_dir
+)
+
+header_filter = '^{}/.*'.format(src_dir)
+
+files = glob.glob('{}/**/*.cpp'.format(src_dir))
+
+for fname in files:
+    subprocess.run(
+        [
+            'clang-tidy',
+            "-header-filter='{}".format(header_filter),
+            '-p=.',
+            fname
+        ],
+        stderr=subprocess.PIPE,
+        cwd=build_dir
+    )
+
+shutil.rmtree(build_dir, ignore_errors=True)

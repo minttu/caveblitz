@@ -56,7 +56,6 @@ struct PlayerInput {
 
         return true;
     }
-
 };
 using PlayerInput = struct PlayerInput;
 
