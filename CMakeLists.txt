@@ -17,9 +17,12 @@ ADD_SUBDIRECTORY(extlibs/libSDL2pp)
 INCLUDE(FindPkgConfig)
 INCLUDE(FindOpenGL REQUIRED)
 
+FIND_PACKAGE(PNG 1.6 REQUIRED)
+
 INCLUDE_DIRECTORIES(
     ${SDL2PP_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}
+    ${PNG_INCLUDE_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/extlibs/GSL/include
     ${CMAKE_CURRENT_LIST_DIR}/extlibs/glm
 )
@@ -33,6 +36,7 @@ SET(
     src/Client/Ship.cpp src/Client/Ship.h
     src/Client/FPSManager.cpp src/Client/FPSManager.h
     src/Common/DataTransfer.h
+    src/Common/Image.cpp src/Common/Image.h
 )
 
 ADD_EXECUTABLE(caveblitz ${SOURCE_FILES})
@@ -40,6 +44,7 @@ TARGET_LINK_LIBRARIES(
     caveblitz
     ${SDL2PP_LIBRARIES}
     ${OPENGL_LIBRARIES}
+    ${PNG_LIBRARIES}
 )
 
 TARGET_COMPILE_DEFINITIONS(

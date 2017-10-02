@@ -17,6 +17,7 @@ Game::Game()
           renderer(window, -1, SDL_RENDERER_ACCELERATED),
           _target(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())) {
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    // this->renderer.SetScale(1.5f, 1.5f);
 
     SDL2pp::Surface icon("assets/icon.png");
     this->window.SetIcon(icon);
@@ -45,6 +46,11 @@ void Game::run() {
     auto ship = std::make_shared<Ship>(Ship());
     this->ships[player_id] = ship;
     ship->texture = this->load_texture("assets/ship.png");
+
+    auto map_texture = this->load_texture("assets/maps/abstract/dynamic.png");
+
+    SDL2pp::Texture render_target(
+            this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 1024);
 
     auto input_data = std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>());
     input_data->reserve(1024);
@@ -97,15 +103,28 @@ void Game::run() {
 
         server->handle_input(input_data);
 
-        this->renderer.SetDrawColor(100, 149, 237);
-        this->renderer.Clear();
-
         server->update(dt);
         server->serialize(this->_target);
         this->handle_update();
 
+        this->renderer.SetTarget(render_target);
+        this->renderer.SetDrawColor(100, 149, 237);
+        this->renderer.Clear();
+
+        this->renderer.Copy(*map_texture,
+                            SDL2pp::Rect(0, 0, 1024, 1024),
+                            SDL2pp::Rect(0, 0, 1024, 1024));
         ship->draw(&this->renderer, dt);
 
+        this->renderer.SetTarget();
+
+        auto right_x = std::round(std::max(std::min(ship->x - 320, 1024.0f - 640.0f), 0.0f));
+        auto top_y = std::round(std::max(std::min(ship->y - 240, 1024.0f - 480.0f), 0.0f));
+
+        SDL2pp::Rect view(right_x, top_y, 640, 480);
+
+        this->renderer.Clear();
+        this->renderer.Copy(render_target, view, SDL2pp::NullOpt);
         this->renderer.Present();
 
         dt = this->fps_manager.delay();

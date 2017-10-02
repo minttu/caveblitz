@@ -2,7 +2,9 @@
 
 const int MAX_PLAYERS = 4;
 
-Server::Server() = default;
+Server::Server() {
+    this->bg = read_png("assets/maps/abstract/dynamic.png");
+}
 
 PlayerID Server::join_server() {
     if (this->players.size() >= MAX_PLAYERS) {
@@ -63,26 +65,44 @@ bool Server::handle_player_input(PlayerInput input) {
     return true;
 }
 
+void Server::check_player_collisions(std::shared_ptr<ServerPlayer> &player, double dt) {
+    if (player->position.x <= 0) {
+        player->collide(dt, 1, fmaxf(1, player->position.y));
+    } else if (player->position.x >= 1023) {
+        player->collide(dt, 1023, fminf(1023, player->position.y));
+    } else if (player->position.y <= 0) {
+        player->collide(dt, fmaxf(1, player->position.x), 1);
+    } else if (player->position.y >= 1023) {
+        player->collide(dt, fminf(1023, player->position.x), 1023);
+    }
+
+    auto px = static_cast<uint32_t>(fminf(1023.0f, fmaxf(0.0f, roundf(player->position.x))));
+    auto py = static_cast<uint32_t>(fminf(1023.0f, fmaxf(0.0f, roundf(player->position.y))));
+
+    auto pos = this->bg.at(px, py);
+    if (pos[3] > 0) {
+        player->collide(dt, px, py);
+    }
+}
+
 void Server::update(double dt) {
     for (auto const &x : this->players) {
         auto id = x.first;
         auto player = x.second;
-
-        if (player->position.x <= 0) {
-            player->collide(dt, 1, fmaxf(1, player->position.y));
-        } else if (player->position.y <= 0) {
-            player->collide(dt, fmaxf(1, player->position.x), 1);
-        }
+        PlayerInput input{};
 
         try {
-            auto input = this->player_inputs.at(id);
-
-            player->update(dt,
-                           static_cast<float>(input.thrust) / 128,
-                           static_cast<float>(input.rotation) / 128);
+            input = this->player_inputs.at(id);
         } catch (const std::out_of_range &oor) {
-            continue;
+            input.rotation = 0;
+            input.thrust = 0;
         }
+
+        player->update(dt,
+                       static_cast<float>(input.thrust) / 128,
+                       static_cast<float>(input.rotation) / 128);
+
+        this->check_player_collisions(player, dt);
     }
 
     this->player_inputs.clear();

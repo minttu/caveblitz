@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../Common/DataTransfer.h"
+#include "../Common/Image.h"
 #include "ServerPlayer.h"
 
 class Server {
@@ -16,6 +17,10 @@ private:
     std::map<PlayerID, PlayerInput> player_inputs;
 
     bool handle_player_input(PlayerInput input);
+
+    void check_player_collisions(std::shared_ptr<ServerPlayer> &player, double dt);
+
+    Image bg;
 
 public:
     Server();
