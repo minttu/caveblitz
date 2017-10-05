@@ -105,13 +105,18 @@ void Server::explode_projectile(std::shared_ptr<ServerProjectile> &prj) {
 }
 
 void Server::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
+    if (player->primary_ready < 0) {
+        return;
+    }
+
+    player->primary_ready = -0.25f;
     auto projectile_id = ++this->projectile_id;
     auto rotation_rad = player->rotation * glm::pi<float>() / 180;
     auto projectile = std::make_shared<ServerProjectile>(
             ServerProjectile(player->player_id,
                              projectile_id,
                              1,
-                             player->position,
+                             player->front_position(),
                              glm::rotate(glm::vec2(0.0f, -220.0f), rotation_rad)));
 
     this->projectiles[projectile_id] = projectile;

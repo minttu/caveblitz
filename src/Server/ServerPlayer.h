@@ -16,12 +16,15 @@ public:
     glm::vec2 speed;
     float rotation;
     bool colliding;
+    float primary_ready;
 
     explicit ServerPlayer(PlayerID id);
 
     void update(float dt, float thrust, float rotation);
 
     void collide(float dt, float x, float y);
+
+    glm::vec2 front_position() const;
 };
 
 #endif // CAVEBLITZ_SERVER_SERVER_PLAYER_H
