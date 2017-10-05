@@ -102,7 +102,6 @@ void Server::explode_projectile(std::shared_ptr<ServerProjectile> &prj) {
     explosion->y = fminf(1023.0f, fmaxf(0.0f, roundf(prj->position.y)));
 
     this->explosions.push_back(explosion);
-    this->projectiles.erase(prj->projectile_id);
 }
 
 void Server::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
@@ -146,12 +145,15 @@ void Server::update(float dt) {
     this->player_inputs.clear();
     this->explosions.clear();
 
-    for (auto const &x : this->projectiles) {
-        auto projectile = x.second;
+    for (auto it = this->projectiles.begin(); it != this->projectiles.end();) {
+        auto projectile = it->second;
 
         projectile->update(dt);
         if (this->check_projectile_collisions(projectile)) {
             this->explode_projectile(projectile);
+            it = this->projectiles.erase(it);
+        } else {
+            ++it;
         }
     }
 }
