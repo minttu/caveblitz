@@ -7,7 +7,7 @@ Ship::Ship() {
     this->color = SDL2pp::Color(255 / 4 * 3, 0, 0);
 }
 
-void Ship::draw(SDL2pp::Renderer *renderer, double /*unused*/) const {
+void Ship::draw(SDL2pp::Renderer *renderer, float /*unused*/) const {
     SDL2pp::Rect src_rect(1, 1, 32, 32);
     SDL2pp::Rect rect(static_cast<int>(roundf(this->x) - 16),
                       static_cast<int>(roundf(this->y) - 16),

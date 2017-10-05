@@ -1,5 +1,5 @@
-#ifndef CAVEBLITZ_SERVER_PLAYER_H
-#define CAVEBLITZ_SERVER_PLAYER_H
+#ifndef CAVEBLITZ_SERVER_SERVER_PLAYER_H
+#define CAVEBLITZ_SERVER_SERVER_PLAYER_H
 
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -19,9 +19,9 @@ public:
 
     explicit ServerPlayer(PlayerID id);
 
-    void update(double dt, float thrust, float rotation);
+    void update(float dt, float thrust, float rotation);
 
-    void collide(double dt, float x, float y);
+    void collide(float dt, float x, float y);
 };
 
-#endif // CAVEBLITZ_SERVER_PLAYER_H
+#endif // CAVEBLITZ_SERVER_SERVER_PLAYER_H

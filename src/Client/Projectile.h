@@ -1,5 +1,5 @@
-#ifndef CAVEBLITZ_SHIP_H
-#define CAVEBLITZ_SHIP_H
+#ifndef CAVEBLITZ_CLIENT_PROJECTILE_H
+#define CAVEBLITZ_CLIENT_PROJECTILE_H
 
 #include <memory>
 
@@ -10,17 +10,15 @@
 #include <SDL2pp/Surface.hh>
 #include <SDL2pp/Texture.hh>
 
-class Ship {
+class Projectile {
 public:
     std::shared_ptr<SDL2pp::Texture> texture;
     float x;
     float y;
-    float rotation;
-    SDL2pp::Color color;
 
-    Ship();
+    Projectile();
 
-    void draw(SDL2pp::Renderer *renderer, float dt) const;
+    void draw(SDL2pp::Renderer *renderer) const;
 };
 
-#endif // CAVEBLITZ_SHIP_H
+#endif // CAVEBLITZ_CLIENT_PROJECTILE_H

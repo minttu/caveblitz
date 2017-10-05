@@ -10,12 +10,12 @@ ServerPlayer::ServerPlayer(PlayerID id)
           colliding(false) {
 }
 
-void ServerPlayer::update(double dt, float thrust, float rotation) {
+void ServerPlayer::update(float dt, float thrust, float rotation) {
     this->previous_position = this->position;
 
     this->rotation -= rotation * 90 * dt;
-    this->velocity +=
-            glm::rotate(glm::vec2(0.0f, -thrust * dt), this->rotation * glm::pi<float>() / 180);
+    auto rotation_rad = this->rotation * glm::pi<float>() / 180;
+    this->velocity += glm::rotate(glm::vec2(0.0f, -thrust * dt), rotation_rad);
     if (!this->colliding) {
         this->position += this->velocity * this->speed;
     }
@@ -23,7 +23,7 @@ void ServerPlayer::update(double dt, float thrust, float rotation) {
     this->velocity *= (0.95f * 60 * dt);
 }
 
-void ServerPlayer::collide(double /*unused*/, float /*unused*/, float /*unused*/) {
+void ServerPlayer::collide(float /*unused*/, float /*unused*/, float /*unused*/) {
     this->velocity = glm::vec2(0.0f, 0.0f);
     this->position = this->previous_position;
     this->colliding = true;

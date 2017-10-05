@@ -29,6 +29,7 @@ enum InputDataType : uint8_t { PLAYER_INPUT = 1 };
 const uint8_t INPUT_DATA_SIZES[255] = {0, 4};
 
 using PlayerID = uint8_t;
+using ProjectileID = uint8_t; // TODO: uint16_t
 
 struct PlayerInput {
     PlayerID player_id;
@@ -59,9 +60,14 @@ struct PlayerInput {
 };
 using PlayerInput = struct PlayerInput;
 
-enum ResponseDataType : uint8_t { PLAYER_UPDATE = 1, SERVER_UPDATE = 2 };
+enum ResponseDataType : uint8_t {
+    PLAYER_UPDATE = 1,
+    SERVER_UPDATE = 2,
+    PROJECTILE_UPDATE = 3,
+    EXPLOSION_UPDATE = 4
+};
 
-const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8};
+const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8, 11, 11};
 
 struct ServerUpdate {
     uint32_t frame;
@@ -77,12 +83,14 @@ struct ServerUpdate {
         data.serialize(target);
     }
 
-    void deserialize(const gsl::span<uint8_t> &target) {
+    bool deserialize(const gsl::span<uint8_t> &target) {
         FloatBytes data{};
         data.deserialize(target, 1);
         frame = data.i;
         data.deserialize(target, 5);
         delta_ticks = data.i;
+
+        return true;
     }
 };
 using ServerUpdate = struct ServerUpdate;
@@ -126,5 +134,81 @@ struct PlayerUpdate {
     }
 };
 using PlayerUpdate = struct PlayerUpdate;
+
+struct ProjectileUpdate {
+    ProjectileID projectile_id;
+    PlayerID player_id;
+    uint8_t projectile_type;
+    float x;
+    float y;
+
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(PROJECTILE_UPDATE));
+        target->push_back(projectile_id);
+        target->push_back(player_id);
+        target->push_back(projectile_type);
+
+        FloatBytes data{};
+        data.f = x;
+        data.serialize(target);
+        data.f = y;
+        data.serialize(target);
+    }
+
+    bool deserialize(const gsl::span<uint8_t> &target) {
+
+        projectile_id = target[1];
+        player_id = target[2];
+        projectile_type = target[3];
+
+        FloatBytes data{};
+        data.deserialize(target, 4);
+        x = data.f;
+        data.deserialize(target, 8);
+        y = data.f;
+
+        return true;
+    }
+};
+
+using ProjectileUpdate = struct ProjectileUpdate;
+
+struct ExplosionUpdate {
+    ProjectileID projectile_id;
+    uint8_t projectile_type;
+    uint8_t explosion_size;
+    float x;
+    float y;
+
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(EXPLOSION_UPDATE));
+        target->push_back(projectile_id);
+        target->push_back(projectile_type);
+        target->push_back(explosion_size);
+
+        FloatBytes data{};
+        data.f = x;
+        data.serialize(target);
+        data.f = y;
+        data.serialize(target);
+    }
+
+    bool deserialize(const gsl::span<uint8_t> &target) {
+
+        projectile_id = target[1];
+        projectile_type = target[2];
+        explosion_size = target[3];
+
+        FloatBytes data{};
+        data.deserialize(target, 4);
+        x = data.f;
+        data.deserialize(target, 8);
+        y = data.f;
+
+        return true;
+    }
+};
+
+using ExplosionUpdate = struct ExplosionUpdate;
 
 #endif // CAVEBLITZ_DATA_TRANSFER_h

@@ -106,6 +106,7 @@ void Game::run() {
         server->update(dt);
         server->serialize(this->_target);
         this->handle_update();
+        this->_target->clear();
 
         this->renderer.SetTarget(render_target);
         this->renderer.SetDrawColor(100, 149, 237);
@@ -114,6 +115,12 @@ void Game::run() {
         this->renderer.Copy(*map_texture,
                             SDL2pp::Rect(0, 0, 1024, 1024),
                             SDL2pp::Rect(0, 0, 1024, 1024));
+
+        for (const auto &x : this->projectiles) {
+            auto projectile = x.second;
+            projectile->draw(&this->renderer);
+        }
+
         ship->draw(&this->renderer, dt);
 
         this->renderer.SetTarget();
@@ -136,6 +143,8 @@ void Game::handle_update() {
     std::ptrdiff_t offset = 0;
 
     PlayerUpdate player_update{};
+    ProjectileUpdate projectile_update{};
+    ExplosionUpdate explosion_update{};
 
     while (offset < target.size()) {
         auto type = target[offset];
@@ -148,7 +157,7 @@ void Game::handle_update() {
             break;
         }
 
-        auto span = target.subspan(offset, offset + size);
+        auto span = target.subspan(offset, size);
 
         switch (type) {
         case PLAYER_UPDATE:
@@ -158,14 +167,20 @@ void Game::handle_update() {
 
             this->handle_player_update(player_update);
             break;
+        case PROJECTILE_UPDATE:
+            projectile_update.deserialize(span);
+            this->handle_projectile_update(projectile_update);
+            break;
+        case EXPLOSION_UPDATE:
+            explosion_update.deserialize(span);
+            this->handle_explosion_update(explosion_update);
+            break;
         default:
             break;
         }
 
         offset += size;
     }
-
-    this->_target->clear();
 }
 
 void Game::handle_player_update(PlayerUpdate pu) {
@@ -178,4 +193,24 @@ void Game::handle_player_update(PlayerUpdate pu) {
     ship->x = pu.x;
     ship->y = pu.y;
     ship->rotation = pu.rotation;
+}
+
+void Game::handle_projectile_update(ProjectileUpdate pu) {
+    if (this->projectiles.find(pu.projectile_id) == this->projectiles.end()) {
+        auto created_projectile = std::make_shared<Projectile>(Projectile());
+        created_projectile->texture = this->load_texture("assets/ship.png");
+        this->projectiles[pu.projectile_id] = created_projectile;
+    }
+
+    auto projectile = this->projectiles[pu.projectile_id];
+    projectile->x = pu.x;
+    projectile->y = pu.y;
+}
+
+void Game::handle_explosion_update(ExplosionUpdate eu) {
+    if (this->projectiles.find(eu.projectile_id) == this->projectiles.end()) {
+        return;
+    }
+
+    this->projectiles.erase(eu.projectile_id);
 }

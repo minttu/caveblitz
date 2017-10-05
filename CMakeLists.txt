@@ -32,9 +32,11 @@ SET(
     src/main.cpp
     src/Server/Server.cpp src/Server/Server.h
     src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h
+    src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
     src/Client/Game.cpp src/Client/Game.h
     src/Client/Ship.cpp src/Client/Ship.h
     src/Client/FPSManager.cpp src/Client/FPSManager.h
+    src/Client/Projectile.cpp src/Client/Projectile.h
     src/Common/DataTransfer.h
     src/Common/Image.cpp src/Common/Image.h
 )
