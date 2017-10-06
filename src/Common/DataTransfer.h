@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-union FloatBytes {
+union Bytes4 {
     float f;
     uint32_t i;
     uint8_t b[4];
@@ -22,6 +22,20 @@ union FloatBytes {
     }
 };
 
+union Bytes2 {
+    uint16_t i;
+    uint8_t b[2];
+
+    inline void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(b[0]);
+        target->push_back(b[1]);
+    }
+
+    inline void deserialize(const gsl::span<uint8_t> &target, uint32_t offset) {
+        memcpy(&b, target.data() + offset, 2);
+    }
+};
+
 enum PlayerInputFlags { PLAYER_INPUT_PRIMARY_USE = 0x01, PLAYER_INPUT_SECONDARY_USE = 0x02 };
 
 enum InputDataType : uint8_t { PLAYER_INPUT = 1 };
@@ -29,7 +43,7 @@ enum InputDataType : uint8_t { PLAYER_INPUT = 1 };
 const uint8_t INPUT_DATA_SIZES[255] = {0, 4};
 
 using PlayerID = uint8_t;
-using ProjectileID = uint8_t; // TODO: uint16_t
+using ProjectileID = uint16_t;
 
 struct PlayerInput {
     PlayerID player_id;
@@ -67,7 +81,7 @@ enum ResponseDataType : uint8_t {
     EXPLOSION_UPDATE = 4
 };
 
-const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8, 11, 11};
+const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8, 12, 12};
 
 struct ServerUpdate {
     uint32_t frame;
@@ -76,7 +90,7 @@ struct ServerUpdate {
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
         target->push_back(static_cast<uint8_t>(SERVER_UPDATE));
 
-        FloatBytes data{};
+        Bytes4 data{};
         data.i = frame;
         data.serialize(target);
         data.i = delta_ticks;
@@ -84,7 +98,7 @@ struct ServerUpdate {
     }
 
     bool deserialize(const gsl::span<uint8_t> &target) {
-        FloatBytes data{};
+        Bytes4 data{};
         data.deserialize(target, 1);
         frame = data.i;
         data.deserialize(target, 5);
@@ -106,7 +120,7 @@ struct PlayerUpdate {
         target->push_back(static_cast<uint8_t>(PLAYER_UPDATE));
         target->push_back(player_id);
         target->push_back(health);
-        FloatBytes data{};
+        Bytes4 data{};
         data.f = x;
         data.serialize(target);
         data.f = y;
@@ -122,7 +136,7 @@ struct PlayerUpdate {
 
         player_id = target[1];
         health = target[2];
-        FloatBytes data{};
+        Bytes4 data{};
         data.deserialize(target, 3);
         x = data.f;
         data.deserialize(target, 7);
@@ -144,11 +158,13 @@ struct ProjectileUpdate {
 
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
         target->push_back(static_cast<uint8_t>(PROJECTILE_UPDATE));
-        target->push_back(projectile_id);
+        Bytes2 data2{};
+        data2.i = projectile_id;
+        data2.serialize(target);
         target->push_back(player_id);
         target->push_back(projectile_type);
 
-        FloatBytes data{};
+        Bytes4 data{};
         data.f = x;
         data.serialize(target);
         data.f = y;
@@ -156,15 +172,16 @@ struct ProjectileUpdate {
     }
 
     bool deserialize(const gsl::span<uint8_t> &target) {
+        Bytes2 data2{};
+        data2.deserialize(target, 1);
+        projectile_id = data2.i;
+        player_id = target[3];
+        projectile_type = target[4];
 
-        projectile_id = target[1];
-        player_id = target[2];
-        projectile_type = target[3];
-
-        FloatBytes data{};
-        data.deserialize(target, 4);
+        Bytes4 data{};
+        data.deserialize(target, 5);
         x = data.f;
-        data.deserialize(target, 8);
+        data.deserialize(target, 9);
         y = data.f;
 
         return true;
@@ -182,11 +199,13 @@ struct ExplosionUpdate {
 
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
         target->push_back(static_cast<uint8_t>(EXPLOSION_UPDATE));
-        target->push_back(projectile_id);
+        Bytes2 data2{};
+        data2.i = projectile_id;
+        data2.serialize(target);
         target->push_back(projectile_type);
         target->push_back(explosion_size);
 
-        FloatBytes data{};
+        Bytes4 data{};
         data.f = x;
         data.serialize(target);
         data.f = y;
@@ -194,15 +213,16 @@ struct ExplosionUpdate {
     }
 
     bool deserialize(const gsl::span<uint8_t> &target) {
+        Bytes2 data2{};
+        data2.deserialize(target, 1);
+        projectile_id = data2.i;
+        projectile_type = target[3];
+        explosion_size = target[4];
 
-        projectile_id = target[1];
-        projectile_type = target[2];
-        explosion_size = target[3];
-
-        FloatBytes data{};
-        data.deserialize(target, 4);
+        Bytes4 data{};
+        data.deserialize(target, 5);
         x = data.f;
-        data.deserialize(target, 8);
+        data.deserialize(target, 9);
         y = data.f;
 
         return true;

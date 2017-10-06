@@ -15,7 +15,7 @@
 
 class Server {
 private:
-    uint8_t projectile_id;
+    ProjectileID projectile_id;
     Image bg;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
