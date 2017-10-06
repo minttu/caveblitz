@@ -14,6 +14,10 @@ struct Image {
     std::array<uint8_t, 4> at(uint32_t x, uint32_t y) {
         return data[x + (y * width)];
     }
+
+    inline void inv(uint32_t x, uint32_t y) {
+        data[x + (y * width)][3] = 0;
+    }
 };
 
 Image read_png(const std::string &file_name);

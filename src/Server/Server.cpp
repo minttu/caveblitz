@@ -100,8 +100,24 @@ void Server::explode_projectile(std::shared_ptr<ServerProjectile> &prj) {
     explosion->explosion_size = 32;
     explosion->x = fminf(1023.0f, fmaxf(0.0f, roundf(prj->position.x)));
     explosion->y = fminf(1023.0f, fmaxf(0.0f, roundf(prj->position.y)));
-
     this->explosions.push_back(explosion);
+
+    auto diameter = explosion->explosion_size / 2;
+    auto diameter_squared = diameter * diameter;
+    for (int y = 0; y < explosion->explosion_size; y++) {
+        for (int x = 0; x < explosion->explosion_size; x++) {
+            if (((x - diameter) * (x - diameter) + (y - diameter) * (y - diameter)) <=
+                diameter_squared) {
+                auto xx = x - diameter + explosion->x;
+                auto yy = y - diameter + explosion->y;
+                if (xx < 0 || yy < 0 || xx > 1023 || yy > 1023) {
+                    continue;
+                }
+
+                this->bg.inv(xx, yy);
+            }
+        }
+    }
 }
 
 void Server::fire_projectile(std::shared_ptr<ServerPlayer> &player) {

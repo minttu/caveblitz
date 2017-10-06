@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../Common/DataTransfer.h"
+#include "../Common/Image.h"
 #include "../Server/Server.h"
 #include "Game.h"
 
@@ -15,9 +16,10 @@ Game::Game()
                  480,
                  SDL_WINDOW_SHOWN),
           renderer(window, -1, SDL_RENDERER_ACCELERATED),
+          bg(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, 1024, 1024),
           _target(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())) {
+
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-    // this->renderer.SetScale(1.5f, 1.5f);
 
     SDL2pp::Surface icon("assets/icon.png");
     this->window.SetIcon(icon);
@@ -47,7 +49,27 @@ void Game::run() {
     this->ships[player_id] = ship;
     ship->texture = this->load_texture("assets/ship.png");
 
-    auto map_texture = this->load_texture("assets/maps/abstract/dynamic.png");
+    {
+        SDL2pp::Texture::LockHandle lock = this->bg.Lock();
+        auto start = static_cast<unsigned char *>(lock.GetPixels());
+        int pitch = lock.GetPitch();
+        auto bg_image = read_png("assets/maps/abstract/dynamic.png");
+        uint32_t y = 0;
+        uint32_t x = 0;
+        for (const auto &i : bg_image.data) {
+            start[(x * 4) + (y * pitch) + 0] = i[0];
+            start[(x * 4) + (y * pitch) + 1] = i[1];
+            start[(x * 4) + (y * pitch) + 2] = i[2];
+            start[(x * 4) + (y * pitch) + 3] = i[3];
+            x++;
+            if (x == bg_image.width) {
+                x = 0;
+                y++;
+            }
+        }
+    }
+
+    this->bg.SetBlendMode(SDL_BLENDMODE_BLEND);
 
     SDL2pp::Texture render_target(
             this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 1024);
@@ -109,12 +131,10 @@ void Game::run() {
         this->_target->clear();
 
         this->renderer.SetTarget(render_target);
-        this->renderer.SetDrawColor(100, 149, 237);
+        this->renderer.SetDrawColor(100, 149, 237, 255);
         this->renderer.Clear();
 
-        this->renderer.Copy(*map_texture,
-                            SDL2pp::Rect(0, 0, 1024, 1024),
-                            SDL2pp::Rect(0, 0, 1024, 1024));
+        this->renderer.Copy(bg, SDL2pp::Rect(0, 0, 1024, 1024), SDL2pp::Rect(0, 0, 1024, 1024));
 
         for (const auto &x : this->projectiles) {
             auto projectile = x.second;
@@ -208,9 +228,73 @@ void Game::handle_projectile_update(ProjectileUpdate pu) {
 }
 
 void Game::handle_explosion_update(ExplosionUpdate eu) {
-    if (this->projectiles.find(eu.projectile_id) == this->projectiles.end()) {
+    if (this->projectiles.find(eu.projectile_id) != this->projectiles.end()) {
+        this->projectiles.erase(eu.projectile_id);
+    }
+
+    if (eu.explosion_size == 0) {
         return;
     }
 
-    this->projectiles.erase(eu.projectile_id);
+    auto diameter = eu.explosion_size / 2;
+    auto diameter_squared = diameter * diameter;
+
+    int min_x = 9999;
+    int min_y = 9999;
+    int max_x = 0;
+    int max_y = 0;
+    int off_x = 9999;
+    int off_y = 9999;
+
+    std::vector<bool> offs(eu.explosion_size * eu.explosion_size);
+    for (int y = 0; y < eu.explosion_size; y++) {
+        for (int x = 0; x < eu.explosion_size; x++) {
+            size_t offs_offset =
+                    static_cast<size_t>(x) + (static_cast<size_t>(y) * eu.explosion_size);
+            if (((x - diameter) * (x - diameter) + (y - diameter) * (y - diameter)) <=
+                diameter_squared) {
+                auto xx = x - diameter + eu.x;
+                auto yy = y - diameter + eu.y;
+                auto ok = (xx >= 0 && yy >= 0 && xx <= 1023 && yy <= 1023);
+                offs[offs_offset] = ok;
+                if (ok) {
+                    if (xx < min_x) {
+                        min_x = xx;
+                        off_x = x;
+                    }
+                    if (yy < min_y) {
+                        min_y = yy;
+                        off_y = y;
+                    }
+                    if (xx > max_x) {
+                        max_x = xx;
+                    }
+                    if (yy > max_y) {
+                        max_y = yy;
+                    }
+                }
+            } else {
+                offs[offs_offset] = false;
+            }
+        }
+    }
+
+    if (min_x == 9999 && min_y == 9999 && max_x == 0 && max_y == 0) {
+        return;
+    }
+
+    SDL2pp::Rect area(min_x, min_y, max_x - min_x + 1, max_y - min_y + 1);
+
+    SDL2pp::Texture::LockHandle lock = this->bg.Lock(area);
+    auto start = static_cast<uint8_t *>(lock.GetPixels());
+    int pitch = lock.GetPitch();
+
+    for (int y = 0; y < area.h; y++) {
+        for (int x = 0; x < area.w; x++) {
+            if (offs[static_cast<size_t>(x + off_x) +
+                     static_cast<size_t>(y + off_y) * eu.explosion_size]) {
+                start[static_cast<int>(x * 4 + (y * pitch)) + 3] = 0;
+            }
+        }
+    }
 }

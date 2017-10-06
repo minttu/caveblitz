@@ -24,6 +24,7 @@ private:
     SDL2pp::SDL sdl;
     SDL2pp::Window window;
     SDL2pp::Renderer renderer;
+    SDL2pp::Texture bg;
     FPSManager fps_manager;
     std::map<const char *, std::shared_ptr<SDL2pp::Texture>> textures;
     std::map<PlayerID, std::shared_ptr<Ship>> ships;
