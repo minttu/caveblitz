@@ -16,6 +16,7 @@
 class Server {
 private:
     uint8_t projectile_id;
+    Image bg;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
     std::map<ProjectileID, std::shared_ptr<ServerProjectile>> projectiles;
@@ -32,7 +33,27 @@ private:
 
     void fire_projectile(std::shared_ptr<ServerPlayer> &player);
 
-    Image bg;
+    void apply_explosion(std::shared_ptr<ExplosionUpdate> &explosion);
+
+    template <typename T>
+    T max_x() {
+        return static_cast<T>(this->bg.width - 1);
+    }
+
+    template <typename T>
+    T max_y() {
+        return static_cast<T>(this->bg.height - 1);
+    }
+
+    template <typename T = uint32_t>
+    T clamp_x(float x) {
+        return static_cast<T>(fminf(this->max_x<float>(), fmaxf(0.0f, roundf(x))));
+    }
+
+    template <typename T = uint32_t>
+    T clamp_y(float y) {
+        return static_cast<T>(fminf(this->max_y<float>(), fmaxf(0.0f, roundf(y))));
+    }
 
 public:
     Server();

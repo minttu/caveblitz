@@ -66,18 +66,21 @@ bool Server::handle_player_input(PlayerInput input) {
 }
 
 void Server::check_player_collisions(std::shared_ptr<ServerPlayer> &player, float dt) {
+    auto max_x = this->max_x<float>();
+    auto max_y = this->max_y<float>();
+
     if (player->position.x <= 0) {
         player->collide(dt, 1, fmaxf(1, player->position.y));
-    } else if (player->position.x >= 1023) {
-        player->collide(dt, 1023, fminf(1023, player->position.y));
+    } else if (player->position.x >= max_x) {
+        player->collide(dt, max_x, fminf(max_y, player->position.y));
     } else if (player->position.y <= 0) {
         player->collide(dt, fmaxf(1, player->position.x), 1);
-    } else if (player->position.y >= 1023) {
-        player->collide(dt, fminf(1023, player->position.x), 1023);
+    } else if (player->position.y >= max_y) {
+        player->collide(dt, fminf(max_x, player->position.x), max_y);
     }
 
-    auto px = static_cast<uint32_t>(fminf(1023.0f, fmaxf(0.0f, roundf(player->position.x))));
-    auto py = static_cast<uint32_t>(fminf(1023.0f, fmaxf(0.0f, roundf(player->position.y))));
+    auto px = this->clamp_x<>(player->position.x);
+    auto py = this->clamp_y<>(player->position.y);
 
     auto pos = this->bg.at(px, py);
     if (pos[3] > 0) {
@@ -86,11 +89,14 @@ void Server::check_player_collisions(std::shared_ptr<ServerPlayer> &player, floa
 }
 
 bool Server::check_projectile_collisions(std::shared_ptr<ServerProjectile> &prj) {
-    auto px = static_cast<uint32_t>(fminf(1023.0f, fmaxf(0.0f, roundf(prj->position.x))));
-    auto py = static_cast<uint32_t>(fminf(1023.0f, fmaxf(0.0f, roundf(prj->position.y))));
+    auto max_x = this->max_x<float>();
+    auto max_y = this->max_y<float>();
 
-    return prj->position.x <= 0 || prj->position.x >= 1023 || prj->position.y <= 0 ||
-           prj->position.y >= 1023 || this->bg.at(px, py)[3] > 0;
+    auto px = this->clamp_x<>(prj->position.x);
+    auto py = this->clamp_y<>(prj->position.y);
+
+    return prj->position.x <= 0 || prj->position.x >= max_x || prj->position.y <= 0 ||
+           prj->position.y >= max_y || this->bg.at(px, py)[3] > 0;
 }
 
 void Server::explode_projectile(std::shared_ptr<ServerProjectile> &prj) {
@@ -98,9 +104,16 @@ void Server::explode_projectile(std::shared_ptr<ServerProjectile> &prj) {
     explosion->projectile_id = prj->projectile_id;
     explosion->projectile_type = prj->projectile_type;
     explosion->explosion_size = 32;
-    explosion->x = fminf(1023.0f, fmaxf(0.0f, roundf(prj->position.x)));
-    explosion->y = fminf(1023.0f, fmaxf(0.0f, roundf(prj->position.y)));
+    explosion->x = this->clamp_x<>(prj->position.x);
+    explosion->y = this->clamp_y<>(prj->position.y);
     this->explosions.push_back(explosion);
+
+    this->apply_explosion(explosion);
+}
+
+void Server::apply_explosion(std::shared_ptr<ExplosionUpdate> &explosion) {
+    auto max_x = this->max_x<int>();
+    auto max_y = this->max_y<int>();
 
     auto diameter = explosion->explosion_size / 2;
     auto diameter_squared = diameter * diameter;
@@ -110,7 +123,7 @@ void Server::explode_projectile(std::shared_ptr<ServerProjectile> &prj) {
                 diameter_squared) {
                 auto xx = x - diameter + explosion->x;
                 auto yy = y - diameter + explosion->y;
-                if (xx < 0 || yy < 0 || xx > 1023 || yy > 1023) {
+                if (xx < 0 || yy < 0 || xx > max_x || yy > max_y) {
                     continue;
                 }
 
