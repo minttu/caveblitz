@@ -2,19 +2,25 @@
 
 const int MAX_PLAYERS = 4;
 
-Server::Server() : projectile_id(0) {
+Server::Server() {
     this->bg = read_png("assets/maps/abstract/dynamic.png");
 }
 
-PlayerID Server::join_server() {
+std::shared_ptr<ServerJoinInfo> Server::join_server() {
     if (this->players.size() >= MAX_PLAYERS) {
-        return 255;
+        throw std::runtime_error("maximum players reached");
     }
-    auto id = static_cast<PlayerID>(this->players.size() + 1);
-    auto player = std::make_shared<ServerPlayer>(ServerPlayer(id));
-    this->players[id] = player;
 
-    return id;
+    auto player_id = this->next_player_id++;
+    auto player = std::make_shared<ServerPlayer>(ServerPlayer(player_id));
+    this->players[player_id] = player;
+
+    auto join_info = std::make_shared<ServerJoinInfo>(ServerJoinInfo{});
+    join_info->player_id = player_id;
+    memset(&join_info->map_name, 0, 32);
+    memcpy(&join_info->map_name, "abstract", 32);
+
+    return join_info;
 }
 
 bool Server::handle_input(const std::shared_ptr<std::vector<uint8_t>> &data) {
@@ -139,7 +145,7 @@ void Server::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
     }
 
     player->primary_ready = -0.25f;
-    auto projectile_id = ++this->projectile_id;
+    auto projectile_id = this->next_projectile_id++;
     auto rotation_rad = player->rotation * glm::pi<float>() / 180;
     auto projectile = std::make_shared<ServerProjectile>(
             ServerProjectile(player->player_id,

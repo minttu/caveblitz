@@ -78,10 +78,11 @@ enum ResponseDataType : uint8_t {
     PLAYER_UPDATE = 1,
     SERVER_UPDATE = 2,
     PROJECTILE_UPDATE = 3,
-    EXPLOSION_UPDATE = 4
+    EXPLOSION_UPDATE = 4,
+    SERVER_JOIN_INFO = 5
 };
 
-const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8, 12, 12};
+const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8, 12, 12, 34};
 
 struct ServerUpdate {
     uint32_t frame;
@@ -230,5 +231,21 @@ struct ExplosionUpdate {
 };
 
 using ExplosionUpdate = struct ExplosionUpdate;
+
+struct ServerJoinInfo {
+    PlayerID player_id;
+    uint8_t map_name[32];
+
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(SERVER_JOIN_INFO));
+        target->push_back(player_id);
+        target->insert(target->end(), std::begin(map_name), std::end(map_name));
+    }
+
+    void deserialize(const gsl::span<uint8_t> &target) {
+        player_id = target[1];
+        memcpy(&map_name, target.data() + 2, 32);
+    }
+};
 
 #endif // CAVEBLITZ_DATA_TRANSFER_h

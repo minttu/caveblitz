@@ -15,7 +15,8 @@
 
 class Server {
 private:
-    ProjectileID projectile_id;
+    ProjectileID next_projectile_id = 0;
+    PlayerID next_player_id = 0;
     Image bg;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
@@ -57,8 +58,9 @@ private:
 
 public:
     Server();
+    ~Server() = default;
 
-    PlayerID join_server();
+    std::shared_ptr<ServerJoinInfo> join_server();
 
     bool handle_input(const std::shared_ptr<std::vector<uint8_t>> &data);
 
