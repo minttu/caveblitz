@@ -33,7 +33,11 @@ public:
                std::shared_ptr<Server> server,
                std::shared_ptr<std::vector<PlayerID>> player_ids);
 
+    bool gather_inputs();
+
     bool tick(DeltaTime dt);
+
+    void draw(DeltaTime dt);
 
     void handle_update();
 

@@ -47,15 +47,32 @@ void MatchScene::initialize_layers() {
 }
 
 bool MatchScene::tick(DeltaTime dt) {
+    // main thread ?
+    if (!this->gather_inputs()) {
+        return false;
+    }
+    this->server->handle_input(this->input_data);
     this->input_data->clear();
-    SDL_Event e{};
 
+    // network thread ?
+    this->server->update(dt);
+    this->server->serialize(this->update_data);
+    this->handle_update();
+    this->update_data->clear();
+
+    this->draw(dt);
+
+    return true;
+}
+
+bool MatchScene::gather_inputs() {
     PlayerInput input{};
     input.player_id = this->player_ids->front();
     input.rotation = 0;
     input.thrust = 0;
     input.flags = 0;
 
+    SDL_Event e{};
     while (SDL_PollEvent(&e) != 0) {
         if (e.type == SDL_QUIT) {
             return false;
@@ -88,15 +105,13 @@ bool MatchScene::tick(DeltaTime dt) {
         input.flags |= PLAYER_INPUT_SECONDARY_USE;
     }
 
+    // main thread ?
     input.serialize(this->input_data);
 
-    this->server->handle_input(this->input_data);
+    return true;
+}
 
-    this->server->update(dt);
-    this->server->serialize(this->update_data);
-    this->handle_update();
-    this->update_data->clear();
-
+void MatchScene::draw(DeltaTime dt) {
     this->game->renderer.SetTarget(this->render_target);
     this->game->renderer.SetDrawColor(100, 149, 237, 255);
     this->game->renderer.Clear();
@@ -126,8 +141,6 @@ bool MatchScene::tick(DeltaTime dt) {
     this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
 
     this->game->renderer.Present();
-
-    return true;
 }
 
 void MatchScene::handle_update() {
