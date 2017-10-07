@@ -14,15 +14,17 @@ SET(SDL2PP_WITH_TTF ON)
 SET(SDL2PP_STATIC OFF)
 ADD_SUBDIRECTORY(extlibs/libSDL2pp)
 
-INCLUDE(FindPkgConfig)
+INCLUDE(FindPkgConfig REQUIRED)
 INCLUDE(FindOpenGL REQUIRED)
 
 FIND_PACKAGE(PNG 1.6 REQUIRED)
+PKG_SEARCH_MODULE(ENET REQUIRED libenet)
 
 INCLUDE_DIRECTORIES(
     ${SDL2PP_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}
     ${PNG_INCLUDE_DIR}
+    ${ENET_INCLUDE_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/extlibs/GSL/include
     ${CMAKE_CURRENT_LIST_DIR}/extlibs/glm
 )
@@ -30,14 +32,22 @@ INCLUDE_DIRECTORIES(
 SET(
     SOURCE_FILES
     src/main.cpp
-    src/Server/Server.cpp src/Server/Server.h
-    src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h
-    src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
     src/Client/Game.cpp src/Client/Game.h
     src/Client/MatchScene.cpp src/Client/MatchScene.h
+    src/Client/ServerConnection.cpp src/Client/ServerConnection.h
     src/Client/Ship.cpp src/Client/Ship.h
     src/Client/FPSManager.cpp src/Client/FPSManager.h
     src/Client/Projectile.cpp src/Client/Projectile.h
+    src/Common/DataTransfer.h
+    src/Common/Image.cpp src/Common/Image.h
+)
+
+SET(
+    SERVER_SOURCE_FILES
+    src/server_main.cpp
+    src/Server/Server.cpp src/Server/Server.h
+    src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h
+    src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
     src/Common/DataTransfer.h
     src/Common/Image.cpp src/Common/Image.h
 )
@@ -48,10 +58,21 @@ TARGET_LINK_LIBRARIES(
     ${SDL2PP_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${PNG_LIBRARIES}
+    ${ENET_LIBRARIES}
 )
-
 TARGET_COMPILE_DEFINITIONS(
     caveblitz PRIVATE
+    GLM_ENABLE_EXPERIMENTAL=1
+)
+
+ADD_EXECUTABLE(caveblitz-server ${SERVER_SOURCE_FILES})
+TARGET_LINK_LIBRARIES(
+    caveblitz-server
+    ${PNG_LIBRARIES}
+    ${ENET_LIBRARIES}
+)
+TARGET_COMPILE_DEFINITIONS(
+    caveblitz-server PRIVATE
     GLM_ENABLE_EXPERIMENTAL=1
 )
 
@@ -63,6 +84,7 @@ ADD_CUSTOM_TARGET(
 )
 
 INSTALL(TARGETS caveblitz RUNTIME DESTINATION /)
+INSTALL(TARGETS caveblitz-server RUNTIME DESTINATION /)
 INSTALL(FILES $<TARGET_FILE_DIR:caveblitz>/assets DESTINATION /)
 
 IF(WIN32)

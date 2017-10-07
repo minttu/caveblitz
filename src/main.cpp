@@ -4,7 +4,7 @@
 
 #include "Client/Game.h"
 #include "Client/MatchScene.h"
-#include "Server/Server.h"
+#include "Client/ServerConnection.h"
 
 int main() {
     SDL2pp::SDL sdl(SDL_INIT_VIDEO);
@@ -18,13 +18,9 @@ int main() {
 
     auto game = std::make_shared<Game>(Game(renderer));
 
-    auto server = std::make_shared<Server>(Server());
+    auto server_connection = std::make_shared<ServerConnection>(ServerConnection());
 
-    auto join_1 = server->join_server();
-    auto player_ids = std::make_shared<std::vector<PlayerID>>(std::vector<PlayerID>());
-    player_ids->push_back(join_1->player_id);
-
-    auto scene = std::make_shared<MatchScene>(MatchScene(game, server, player_ids));
+    auto scene = std::make_shared<MatchScene>(MatchScene(game, server_connection));
 
     game->set_scene(scene);
     game->run();

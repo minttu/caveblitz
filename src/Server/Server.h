@@ -1,6 +1,7 @@
 #ifndef CAVEBLITZ_SERVER_SERVER_H
 #define CAVEBLITZ_SERVER_SERVER_H
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <vector>

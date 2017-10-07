@@ -1,8 +1,7 @@
 #include "MatchScene.h"
 
 MatchScene::MatchScene(std::shared_ptr<Game> game,
-                       std::shared_ptr<Server> server,
-                       std::shared_ptr<std::vector<PlayerID>> player_ids)
+                       std::shared_ptr<ServerConnection> server_connection)
         : dynamic_layer(game->renderer,
                         SDL_PIXELFORMAT_ABGR8888,
                         SDL_TEXTUREACCESS_STREAMING,
@@ -12,15 +11,10 @@ MatchScene::MatchScene(std::shared_ptr<Game> game,
                         SDL_PIXELFORMAT_RGBA8888,
                         SDL_TEXTUREACCESS_TARGET,
                         1024,
-                        1024),
-          update_data(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())),
-          input_data(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())) {
+                        1024) {
 
-    this->server = std::move(server);
+    this->server_connection = std::move(server_connection);
     this->game = std::move(game);
-    this->player_ids = std::move(player_ids);
-    this->input_data->reserve(1024);
-    this->update_data->reserve(1024);
     this->initialize_layers();
 }
 
@@ -47,18 +41,13 @@ void MatchScene::initialize_layers() {
 }
 
 bool MatchScene::tick(DeltaTime dt) {
-    // main thread ?
     if (!this->gather_inputs()) {
         return false;
     }
-    this->server->handle_input(this->input_data);
-    this->input_data->clear();
 
-    // network thread ?
-    this->server->update(dt);
-    this->server->serialize(this->update_data);
+    this->server_connection->tick();
+
     this->handle_update();
-    this->update_data->clear();
 
     this->draw(dt);
 
@@ -66,8 +55,10 @@ bool MatchScene::tick(DeltaTime dt) {
 }
 
 bool MatchScene::gather_inputs() {
+    this->server_connection->input_data->clear();
+
     PlayerInput input{};
-    input.player_id = this->player_ids->front();
+    input.player_id = 0;
     input.rotation = 0;
     input.thrust = 0;
     input.flags = 0;
@@ -105,8 +96,7 @@ bool MatchScene::gather_inputs() {
         input.flags |= PLAYER_INPUT_SECONDARY_USE;
     }
 
-    // main thread ?
-    input.serialize(this->input_data);
+    input.serialize(this->server_connection->input_data);
 
     return true;
 }
@@ -133,18 +123,24 @@ void MatchScene::draw(DeltaTime dt) {
     this->game->renderer.SetTarget();
     this->game->renderer.Clear();
 
-    auto ship = this->ships.begin()->second;
-    SDL2pp::Rect view(std::round(std::max(std::min(ship->x - 320, 1024.0f - 640.0f), 0.0f)),
-                      std::round(std::max(std::min(ship->y - 240, 1024.0f - 480.0f), 0.0f)),
-                      640,
-                      480);
-    this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
+    if (!this->ships.empty()) {
+        auto ship = this->ships.begin()->second;
+        SDL2pp::Rect view(std::round(std::max(std::min(ship->x - 320, 1024.0f - 640.0f), 0.0f)),
+                          std::round(std::max(std::min(ship->y - 240, 1024.0f - 480.0f), 0.0f)),
+                          640,
+                          480);
+        this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
+    } else {
+        SDL2pp::Rect view(0, 0, 640, 480);
+        this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
+    }
 
     this->game->renderer.Present();
 }
 
 void MatchScene::handle_update() {
-    gsl::span<uint8_t> target(this->update_data->data(), this->update_data->size());
+    gsl::span<uint8_t> target(this->server_connection->update_data->data(),
+                              this->server_connection->update_data->size());
     std::ptrdiff_t offset = 0;
 
     PlayerUpdate player_update{};

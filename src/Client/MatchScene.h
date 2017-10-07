@@ -1,26 +1,26 @@
 #ifndef CAVEBLITZ_CLIENT_MATCH_SCENE_H
 #define CAVEBLITZ_CLIENT_MATCH_SCENE_H
 
+#include <iostream>
+
 #include "FPSManager.h"
 #include "Game.h"
 #include "Projectile.h"
 #include "Scene.h"
+#include "ServerConnection.h"
 #include "Ship.h"
 
 #include "../Common/DataTransfer.h"
 #include "../Common/Image.h"
-#include "../Server/Server.h"
 
 class MatchScene : public Scene {
 private:
     std::shared_ptr<Game> game;
-    std::shared_ptr<Server> server;
-    std::shared_ptr<std::vector<PlayerID>> player_ids;
+    std::shared_ptr<ServerConnection> server_connection;
+    std::vector<PlayerID> player_ids;
     SDL2pp::Texture dynamic_layer;
     SDL2pp::Texture render_target;
 
-    std::shared_ptr<std::vector<uint8_t>> update_data;
-    std::shared_ptr<std::vector<uint8_t>> input_data;
     std::map<int32_t, bool> keys_held;
 
     std::map<PlayerID, std::shared_ptr<Ship>> ships;
@@ -29,9 +29,7 @@ private:
     void initialize_layers();
 
 public:
-    MatchScene(std::shared_ptr<Game> game,
-               std::shared_ptr<Server> server,
-               std::shared_ptr<std::vector<PlayerID>> player_ids);
+    MatchScene(std::shared_ptr<Game> game, std::shared_ptr<ServerConnection> server_connection);
 
     bool gather_inputs();
 
