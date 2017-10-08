@@ -1,4 +1,8 @@
+#include <cstdlib>
+#include <iostream>
+
 #include <SDL2/SDL.h>
+#include <enet/enet.h>
 
 #undef main
 
@@ -7,6 +11,12 @@
 #include "Client/ServerConnection.h"
 
 int main() {
+    if (enet_initialize() != 0) {
+        std::cerr << "enet_initialize failed\n";
+        return 1;
+    }
+    atexit(enet_deinitialize);
+
     SDL2pp::SDL sdl(SDL_INIT_VIDEO);
     SDL2pp::Window window("caveblitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
     SDL2pp::Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);

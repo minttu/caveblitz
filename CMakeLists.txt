@@ -6,6 +6,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Winit-self -Wo
 
 IF(WIN32)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
+    SET(WIN32_LIBS ws2_32 winmm)
+ELSE()
+    SET(WIN32_LIBS "")
 ENDIF()
 
 SET(SDL2PP_WITH_IMAGE ON)
@@ -55,6 +58,7 @@ SET(
     src/Client/Ship.cpp src/Client/Ship.h
     src/Client/FPSManager.cpp src/Client/FPSManager.h
     src/Client/Projectile.cpp src/Client/Projectile.h
+    src/Client/Scene.h
 )
 
 ADD_EXECUTABLE(caveblitz ${CLIENT_SOURCE_FILES})
@@ -64,6 +68,7 @@ TARGET_LINK_LIBRARIES(
     ${SDL2PP_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ENET_LIBRARIES}
+    ${WIN32_LIBS}
     caveblitz-common
 )
 
@@ -86,6 +91,7 @@ ADD_EXECUTABLE(caveblitz-server ${SERVER_SOURCE_FILES})
 TARGET_LINK_LIBRARIES(
     caveblitz-server
     ${ENET_LIBRARIES}
+    ${WIN32_LIBS}
     caveblitz-common
 )
 TARGET_COMPILE_DEFINITIONS(

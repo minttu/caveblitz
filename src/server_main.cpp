@@ -8,6 +8,8 @@
 
 #include "Server/Server.h"
 
+#undef main
+
 int main() {
     Server game_server;
 
