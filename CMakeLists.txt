@@ -29,8 +29,25 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_LIST_DIR}/extlibs/glm
 )
 
+# Common
+
 SET(
-    SOURCE_FILES
+    COMMON_SOURCE_FILES
+    src/Common/DataTransfer.h
+    src/Common/Image.cpp src/Common/Image.h
+)
+
+ADD_LIBRARY(caveblitz-common ${COMMON_SOURCE_FILES})
+
+TARGET_LINK_LIBRARIES(
+    caveblitz-common
+    ${PNG_LIBRARIES}
+)
+
+# Client
+
+SET(
+    CLIENT_SOURCE_FILES
     src/main.cpp
     src/Client/Game.cpp src/Client/Game.h
     src/Client/MatchScene.cpp src/Client/MatchScene.h
@@ -38,9 +55,24 @@ SET(
     src/Client/Ship.cpp src/Client/Ship.h
     src/Client/FPSManager.cpp src/Client/FPSManager.h
     src/Client/Projectile.cpp src/Client/Projectile.h
-    src/Common/DataTransfer.h
-    src/Common/Image.cpp src/Common/Image.h
 )
+
+ADD_EXECUTABLE(caveblitz ${CLIENT_SOURCE_FILES})
+
+TARGET_LINK_LIBRARIES(
+    caveblitz
+    ${SDL2PP_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    ${ENET_LIBRARIES}
+    caveblitz-common
+)
+
+TARGET_COMPILE_DEFINITIONS(
+    caveblitz PRIVATE
+    GLM_ENABLE_EXPERIMENTAL=1
+)
+
+# Server
 
 SET(
     SERVER_SOURCE_FILES
@@ -48,33 +80,20 @@ SET(
     src/Server/Server.cpp src/Server/Server.h
     src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h
     src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
-    src/Common/DataTransfer.h
-    src/Common/Image.cpp src/Common/Image.h
-)
-
-ADD_EXECUTABLE(caveblitz ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(
-    caveblitz
-    ${SDL2PP_LIBRARIES}
-    ${OPENGL_LIBRARIES}
-    ${PNG_LIBRARIES}
-    ${ENET_LIBRARIES}
-)
-TARGET_COMPILE_DEFINITIONS(
-    caveblitz PRIVATE
-    GLM_ENABLE_EXPERIMENTAL=1
 )
 
 ADD_EXECUTABLE(caveblitz-server ${SERVER_SOURCE_FILES})
 TARGET_LINK_LIBRARIES(
     caveblitz-server
-    ${PNG_LIBRARIES}
     ${ENET_LIBRARIES}
+    caveblitz-common
 )
 TARGET_COMPILE_DEFINITIONS(
     caveblitz-server PRIVATE
     GLM_ENABLE_EXPERIMENTAL=1
 )
+
+# Install
 
 ADD_CUSTOM_TARGET(
     TARGET caveblitz PRE_BUILD
