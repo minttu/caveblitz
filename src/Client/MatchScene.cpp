@@ -136,8 +136,10 @@ void MatchScene::draw(DeltaTime dt) {
     this->game->renderer.SetTarget();
     this->game->renderer.Clear();
 
-    if (!this->ships.empty()) {
-        auto ship = this->ships.begin()->second;
+    if (!this->player_ids.empty() && !this->ships.empty() &&
+        this->ships.find(this->player_ids[0]) != this->ships.end()) {
+
+        auto ship = this->ships[this->player_ids[0]];
         SDL2pp::Rect view(std::round(std::max(std::min(ship->x - 320, 1024.0f - 640.0f), 0.0f)),
                           std::round(std::max(std::min(ship->y - 240, 1024.0f - 480.0f), 0.0f)),
                           640,
