@@ -10,7 +10,6 @@
 
 int main() {
     Server game_server;
-    game_server.join_server();
 
     if (enet_initialize() != 0) {
         std::cerr << "enet initialization failed\n";
@@ -48,9 +47,18 @@ int main() {
             case ENET_EVENT_TYPE_DISCONNECT:
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
+                update_data->clear();
                 input_data->assign(event.packet->data, event.packet->data + event.packet->dataLength);
-                game_server.handle_input(input_data);
+                game_server.handle_input(input_data, update_data);
                 enet_packet_destroy(event.packet);
+                if (!update_data->empty()) {
+                    ENetPacket *response_packet = enet_packet_create(
+                        update_data->data(),
+                        update_data->size(),
+                        ENET_PACKET_FLAG_RELIABLE
+                    );
+                    enet_peer_send(event.peer, 2, response_packet);
+                }
                 break;
             default:
                 break;

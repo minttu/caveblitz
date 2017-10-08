@@ -22,6 +22,8 @@ public:
 
     bool connected{false};
 
+    void join_server();
+
     void tick();
 };
 

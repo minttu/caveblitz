@@ -17,7 +17,7 @@
 class Server {
 private:
     ProjectileID next_projectile_id = 0;
-    PlayerID next_player_id = 0;
+    PlayerID next_player_id = 10;
     Image bg;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
@@ -63,7 +63,8 @@ public:
 
     std::shared_ptr<ServerJoinInfo> join_server();
 
-    bool handle_input(const std::shared_ptr<std::vector<uint8_t>> &data);
+    bool handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
+                      const std::shared_ptr<std::vector<uint8_t>> &output);
 
     void update(float dt);
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const;

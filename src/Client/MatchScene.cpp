@@ -47,6 +47,10 @@ bool MatchScene::tick(DeltaTime dt) {
 
     this->server_connection->tick();
 
+    if (this->server_connection->connected && this->joins_sent == 0) {
+        this->join_server();
+    }
+
     this->handle_update();
 
     this->draw(dt);
@@ -54,11 +58,20 @@ bool MatchScene::tick(DeltaTime dt) {
     return true;
 }
 
+void MatchScene::join_server() {
+    this->server_connection->join_server();
+    this->joins_sent++;
+}
+
 bool MatchScene::gather_inputs() {
     this->server_connection->input_data->clear();
 
+    if (this->player_ids.empty()) {
+        return true;
+    }
+
     PlayerInput input{};
-    input.player_id = 0;
+    input.player_id = this->player_ids[0];
     input.rotation = 0;
     input.thrust = 0;
     input.flags = 0;
@@ -146,6 +159,7 @@ void MatchScene::handle_update() {
     PlayerUpdate player_update{};
     ProjectileUpdate projectile_update{};
     ExplosionUpdate explosion_update{};
+    ServerJoinInfo server_join_info{};
 
     while (offset < target.size()) {
         auto type = target[offset];
@@ -175,6 +189,10 @@ void MatchScene::handle_update() {
         case EXPLOSION_UPDATE:
             explosion_update.deserialize(span);
             this->handle_explosion_update(explosion_update);
+            break;
+        case SERVER_JOIN_INFO:
+            server_join_info.deserialize(span);
+            this->handle_server_join_info(server_join_info);
             break;
         default:
             break;
@@ -280,4 +298,8 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
             }
         }
     }
+}
+
+void MatchScene::handle_server_join_info(ServerJoinInfo sji) {
+    this->player_ids.push_back(sji.player_id);
 }

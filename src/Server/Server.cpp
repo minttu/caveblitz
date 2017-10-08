@@ -23,14 +23,15 @@ std::shared_ptr<ServerJoinInfo> Server::join_server() {
     return join_info;
 }
 
-bool Server::handle_input(const std::shared_ptr<std::vector<uint8_t>> &data) {
-    if (data->empty()) {
+bool Server::handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
+                          const std::shared_ptr<std::vector<uint8_t>> &output) {
+    if (input->empty()) {
         return true;
     }
 
-    PlayerInput input{};
+    PlayerInput player_input{};
     std::ptrdiff_t offset = 0;
-    gsl::span<uint8_t> target(data->data(), data->size());
+    gsl::span<uint8_t> target(input->data(), input->size());
 
     while (offset < target.size()) {
         uint8_t type = target[offset];
@@ -43,11 +44,19 @@ bool Server::handle_input(const std::shared_ptr<std::vector<uint8_t>> &data) {
 
         switch (type) {
         case PLAYER_INPUT:
-            if (!input.deserialize(span)) {
+            if (!player_input.deserialize(span)) {
                 return false;
             }
-            this->handle_player_input(input);
+            this->handle_player_input(player_input);
 
+            break;
+        case PLAYER_JOIN_SERVER:
+            try {
+                auto join_info = this->join_server();
+                join_info->serialize(output);
+            } catch (const std::runtime_error &err) {
+                break;
+            }
             break;
         default:
             return false;

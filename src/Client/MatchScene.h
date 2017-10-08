@@ -18,6 +18,7 @@ private:
     std::shared_ptr<Game> game;
     std::shared_ptr<ServerConnection> server_connection;
     std::vector<PlayerID> player_ids;
+    size_t joins_sent{0};
     SDL2pp::Texture dynamic_layer;
     SDL2pp::Texture render_target;
 
@@ -35,6 +36,8 @@ public:
 
     bool tick(DeltaTime dt);
 
+    void join_server();
+
     void draw(DeltaTime dt);
 
     void handle_update();
@@ -44,6 +47,8 @@ public:
     void handle_projectile_update(ProjectileUpdate pu);
 
     void handle_explosion_update(ExplosionUpdate eu);
+
+    void handle_server_join_info(ServerJoinInfo sji);
 };
 
 #endif // CAVEBLITZ_CLIENT_MATCH_SCENE_H

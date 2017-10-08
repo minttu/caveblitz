@@ -38,9 +38,9 @@ union Bytes2 {
 
 enum PlayerInputFlags { PLAYER_INPUT_PRIMARY_USE = 0x01, PLAYER_INPUT_SECONDARY_USE = 0x02 };
 
-enum InputDataType : uint8_t { PLAYER_INPUT = 1 };
+enum InputDataType : uint8_t { PLAYER_INPUT = 1, PLAYER_JOIN_SERVER = 2 };
 
-const uint8_t INPUT_DATA_SIZES[255] = {0, 4};
+const uint8_t INPUT_DATA_SIZES[255] = {0, 4, 1};
 
 using PlayerID = uint8_t;
 using ProjectileID = uint16_t;
@@ -73,6 +73,14 @@ struct PlayerInput {
     }
 };
 using PlayerInput = struct PlayerInput;
+
+struct PlayerJoinServer {
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(PLAYER_JOIN_SERVER));
+        target->push_back(static_cast<uint8_t>(PLAYER_JOIN_SERVER));
+    }
+};
+using PlayerJoinServer = struct PlayerJoinServer;
 
 enum ResponseDataType : uint8_t {
     PLAYER_UPDATE = 1,

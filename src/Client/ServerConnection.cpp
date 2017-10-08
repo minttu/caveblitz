@@ -55,3 +55,20 @@ void ServerConnection::tick() {
 
     enet_host_flush(this->client);
 }
+
+void ServerConnection::join_server() {
+    if (!this->connected) {
+        return;
+    }
+
+    auto join_data = std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>());
+    PlayerJoinServer join{};
+    join.serialize(join_data);
+
+    ENetPacket *packet =
+            enet_packet_create(join_data->data(), join_data->size(), ENET_PACKET_FLAG_RELIABLE);
+
+    enet_peer_send(this->peer, 2, packet);
+
+    enet_host_flush(this->client);
+}
