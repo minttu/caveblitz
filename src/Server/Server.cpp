@@ -191,7 +191,6 @@ void Server::update(float dt) {
         }
     }
 
-    this->player_inputs.clear();
     this->explosions.clear();
 
     for (auto it = this->projectiles.begin(); it != this->projectiles.end();) {
@@ -232,7 +231,9 @@ void Server::serialize(const std::shared_ptr<std::vector<uint8_t>> &target) cons
 
         projectile_update.serialize(target);
     }
+}
 
+void Server::serialize_reliable(const std::shared_ptr<std::vector<uint8_t>> &target) const {
     for (auto const &explosion : this->explosions) {
         explosion->serialize(target);
     }

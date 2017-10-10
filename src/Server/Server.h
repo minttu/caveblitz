@@ -68,6 +68,7 @@ public:
 
     void update(float dt);
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const;
+    void serialize_reliable(const std::shared_ptr<std::vector<uint8_t>> &target) const;
 };
 
 #endif // CAVEBLITZ_SERVER_SERVER_H

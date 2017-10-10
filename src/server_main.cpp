@@ -71,15 +71,23 @@ int main() {
         game_server.update(dt);
         update_data->clear();
         game_server.serialize(update_data);
-
         ENetPacket *update_packet = enet_packet_create(
             update_data->data(),
             update_data->size(),
             0
         );
-
-        // sendd
         enet_host_broadcast(server, 0, update_packet);
+
+        update_data->clear();
+        game_server.serialize_reliable(update_data);
+        update_packet = enet_packet_create(
+            update_data->data(),
+            update_data->size(),
+            ENET_PACKET_FLAG_RELIABLE
+        );
+        enet_host_broadcast(server, 1, update_packet);
+
+        // send
         enet_host_flush(server);
 
         // sleep
