@@ -18,6 +18,8 @@ public:
     std::shared_ptr<std::vector<uint8_t>> update_data;
     std::shared_ptr<std::vector<uint8_t>> input_data;
 
+    int packets_processed_in_tick;
+
     ServerConnection();
 
     bool connected{false};

@@ -90,7 +90,7 @@ enum ResponseDataType : uint8_t {
     SERVER_JOIN_INFO = 5
 };
 
-const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 34};
+const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33};
 
 struct ServerUpdate {
     uint32_t frame;

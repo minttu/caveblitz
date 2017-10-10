@@ -31,16 +31,16 @@ void ServerConnection::tick() {
         enet_host_flush(this->client);
     }
 
-    int packets = 0;
+    this->packets_processed_in_tick = 0;
     int wait = 10;
 
     ENetEvent event{};
     while (enet_host_service(this->client, &event, wait) > 0) {
         wait = 0;
+
         switch (event.type) {
         case ENET_EVENT_TYPE_CONNECT:
             this->connected = true;
-            packets++;
             std::cerr << "connected!\n";
             break;
         case ENET_EVENT_TYPE_RECEIVE:
@@ -48,7 +48,7 @@ void ServerConnection::tick() {
                                       event.packet->data,
                                       event.packet->data + event.packet->dataLength); // NOLINT
             enet_packet_destroy(event.packet);
-            packets++;
+            this->packets_processed_in_tick++;
             break;
         case ENET_EVENT_TYPE_DISCONNECT:
             this->connected = false;
@@ -59,7 +59,7 @@ void ServerConnection::tick() {
         }
     }
 
-    if (packets == 0) {
+    if (this->packets_processed_in_tick == 0) {
         std::cerr << "skip\n";
     }
 }
