@@ -1,10 +1,11 @@
 #include "Ship.h"
 
-Ship::Ship() {
+Ship::Ship(uint8_t player_id) {
+    this->player_id = player_id;
     this->x = 0.0f;
     this->y = 0.0f;
     this->rotation = 0.0f;
-    this->color = SDL2pp::Color(255 / 4 * 3, 0, 0);
+    this->color = gsl::at(SHIP_COLORS, player_id);
 }
 
 void Ship::draw(SDL2pp::Renderer *renderer, float /*unused*/) const {

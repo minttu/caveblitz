@@ -1,6 +1,6 @@
 #include "Server.h"
 
-const int MAX_PLAYERS = 4;
+const int MAX_PLAYERS = 8;
 
 Server::Server() {
     this->bg = read_png("assets/maps/abstract/dynamic.png");

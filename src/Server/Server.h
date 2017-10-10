@@ -17,7 +17,7 @@
 class Server {
 private:
     ProjectileID next_projectile_id = 0;
-    PlayerID next_player_id = 10;
+    PlayerID next_player_id = 0;
     Image bg;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;

@@ -206,7 +206,7 @@ void MatchScene::handle_update() {
 
 void MatchScene::handle_player_update(PlayerUpdate pu) {
     if (this->ships.find(pu.player_id) == this->ships.end()) {
-        auto create_ship = std::make_shared<Ship>(Ship());
+        auto create_ship = std::make_shared<Ship>(Ship(pu.player_id));
         create_ship->texture = this->game->load_texture("assets/ship.png");
         this->ships[pu.player_id] = create_ship;
     }
