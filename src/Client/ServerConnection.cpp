@@ -7,6 +7,8 @@ ServerConnection::ServerConnection()
     this->update_data->reserve(1024);
     this->input_data->reserve(1024);
 
+    this->packets_processed_in_tick = 0;
+
     this->client = enet_host_create(nullptr, 1, 3, 0, 0);
     if (this->client == nullptr) {
         throw std::runtime_error("couldn't create enet client");
@@ -24,7 +26,8 @@ void ServerConnection::tick() {
     this->update_data->clear();
 
     if (this->connected) {
-        ENetPacket *packet = enet_packet_create(this->input_data->data(), this->input_data->size(), 0);
+        ENetPacket *packet =
+                enet_packet_create(this->input_data->data(), this->input_data->size(), 0);
 
         enet_peer_send(this->peer, 0, packet);
 

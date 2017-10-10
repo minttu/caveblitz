@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include <thread>
 
 #include <SDL2/SDL.h>
 #include <enet/enet.h>
@@ -10,12 +11,23 @@
 #include "Client/MatchScene.h"
 #include "Client/ServerConnection.h"
 
+#include "Server/Server.h"
+
+void server_runner(const bool *should_run) {
+    Server server;
+    server.run(should_run);
+}
+
 int main() {
     if (enet_initialize() != 0) {
         std::cerr << "enet_initialize failed\n";
         return 1;
     }
     atexit(enet_deinitialize);
+
+    bool should_run = true;
+
+    std::thread server_thread(server_runner, &should_run);
 
     SDL2pp::SDL sdl(SDL_INIT_VIDEO);
     SDL2pp::Window window("caveblitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
@@ -34,6 +46,10 @@ int main() {
 
     game->set_scene(scene);
     game->run();
+
+    should_run = false;
+
+    server_thread.join();
 
     return 0;
 }

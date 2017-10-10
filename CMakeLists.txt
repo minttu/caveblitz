@@ -8,6 +8,7 @@ IF(WIN32)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
     SET(WIN32_LIBS ws2_32 winmm)
 ELSE()
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     SET(WIN32_LIBS "")
 ENDIF()
 
@@ -47,6 +48,46 @@ TARGET_LINK_LIBRARIES(
     ${PNG_LIBRARIES}
 )
 
+# Server base
+
+SET(
+    SERVER_LIB_SOURCE_FILES
+    src/Server/Server.cpp src/Server/Server.h
+    src/Server/MatchServer.cpp src/Server/MatchServer.h
+    src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h
+    src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
+)
+
+ADD_LIBRARY(caveblitz-server-lib ${SERVER_LIB_SOURCE_FILES})
+TARGET_LINK_LIBRARIES(
+    caveblitz-server-lib
+    ${ENET_LIBRARIES}
+    ${WIN32_LIBS}
+    caveblitz-common
+)
+TARGET_COMPILE_DEFINITIONS(
+    caveblitz-server-lib PRIVATE
+    GLM_ENABLE_EXPERIMENTAL=1
+)
+
+# Server
+
+SET(
+    SERVER_SOURCE_FILES
+    src/server_main.cpp
+)
+
+ADD_EXECUTABLE(caveblitz-server ${SERVER_SOURCE_FILES})
+TARGET_LINK_LIBRARIES(
+    caveblitz-server
+    caveblitz-common
+    caveblitz-server-lib
+)
+TARGET_COMPILE_DEFINITIONS(
+    caveblitz-server PRIVATE
+    GLM_ENABLE_EXPERIMENTAL=1
+)
+
 # Client
 
 SET(
@@ -70,32 +111,11 @@ TARGET_LINK_LIBRARIES(
     ${ENET_LIBRARIES}
     ${WIN32_LIBS}
     caveblitz-common
+    caveblitz-server-lib
 )
 
 TARGET_COMPILE_DEFINITIONS(
     caveblitz PRIVATE
-    GLM_ENABLE_EXPERIMENTAL=1
-)
-
-# Server
-
-SET(
-    SERVER_SOURCE_FILES
-    src/server_main.cpp
-    src/Server/Server.cpp src/Server/Server.h
-    src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h
-    src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
-)
-
-ADD_EXECUTABLE(caveblitz-server ${SERVER_SOURCE_FILES})
-TARGET_LINK_LIBRARIES(
-    caveblitz-server
-    ${ENET_LIBRARIES}
-    ${WIN32_LIBS}
-    caveblitz-common
-)
-TARGET_COMPILE_DEFINITIONS(
-    caveblitz-server PRIVATE
     GLM_ENABLE_EXPERIMENTAL=1
 )
 
