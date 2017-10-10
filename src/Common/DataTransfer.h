@@ -1,5 +1,5 @@
-#ifndef CAVEBLITZ_DATA_TRANSFER_H
-#define CAVEBLITZ_DATA_TRANSFER_H
+#ifndef CAVEBLITZ_COMMON_DATA_TRANSFER_H
+#define CAVEBLITZ_COMMON_DATA_TRANSFER_H
 
 #include <gsl/gsl>
 #include <memory>
@@ -40,7 +40,7 @@ enum PlayerInputFlags { PLAYER_INPUT_PRIMARY_USE = 0x01, PLAYER_INPUT_SECONDARY_
 
 enum InputDataType : uint8_t { PLAYER_INPUT = 1, PLAYER_JOIN_SERVER = 2 };
 
-const uint8_t INPUT_DATA_SIZES[255] = {0, 4, 1};
+const uint8_t INPUT_DATA_SIZES[] = {0, 4, 1};
 
 using PlayerID = uint8_t;
 using ProjectileID = uint16_t;
@@ -90,7 +90,7 @@ enum ResponseDataType : uint8_t {
     SERVER_JOIN_INFO = 5
 };
 
-const uint8_t RESPONSE_DATA_SIZES[255] = {0, 14, 8, 12, 12, 34};
+const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 34};
 
 struct ServerUpdate {
     uint32_t frame;
@@ -256,4 +256,4 @@ struct ServerJoinInfo {
     }
 };
 
-#endif // CAVEBLITZ_DATA_TRANSFER_h
+#endif // CAVEBLITZ_COMMON_DATA_TRANSFER_H
