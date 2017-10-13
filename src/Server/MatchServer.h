@@ -31,7 +31,7 @@ private:
 
     bool check_projectile_collisions(std::shared_ptr<ServerProjectile> &prj);
 
-    void explode_projectile(std::shared_ptr<ServerProjectile> &prj);
+    void explode_projectile(std::shared_ptr<ServerProjectile> &prj, float x, float y);
 
     void fire_projectile(std::shared_ptr<ServerPlayer> &player);
 

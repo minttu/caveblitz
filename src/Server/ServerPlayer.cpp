@@ -17,10 +17,11 @@ void ServerPlayer::update(float dt, float thrust, float rotation) {
 
     this->rotation -= rotation * 120.0f * dt;
     auto rotation_rad = this->rotation * glm::pi<float>() / 180.0f;
-    this->velocity += glm::rotate(glm::vec2(0.0f, -thrust * dt * 60.0f), rotation_rad);
+    this->velocity +=
+            this->speed * glm::rotate(glm::vec2(0.0f, -thrust * dt * 60.0f), rotation_rad);
     this->velocity += glm::vec2(0, 3.0f * dt);
     if (!this->colliding) {
-        this->position += this->velocity * this->speed * dt;
+        this->position += this->velocity * dt;
     }
     this->colliding = false;
     this->velocity -= this->velocity * (dt * 2.0f);

@@ -107,20 +107,39 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
     auto max_x = this->max_x<float>();
     auto max_y = this->max_y<float>();
 
-    auto px = this->clamp_x<>(prj->position.x);
-    auto py = this->clamp_y<>(prj->position.y);
+    auto x = this->clamp_x<>(prj->previous_position.x);
+    auto y = this->clamp_y<>(prj->previous_position.y);
+    auto delta = prj->position - prj->previous_position;
+    auto steps = glm::length(delta) * 0.5f;
+    auto per_step = delta / steps;
 
-    return prj->position.x <= 0 || prj->position.x >= max_x || prj->position.y <= 0 ||
-           prj->position.y >= max_y || this->bg.at(px, py)[3] > 0;
+    for (int i = 0; i < steps; i++) {
+        x += per_step.x;
+        y += per_step.y;
+
+        auto over_map = x <= 0 || x >= max_x || y <= 0 || y >= max_y;
+        auto collision = over_map ||
+                         this->bg.at(static_cast<uint16_t>(round(x)),
+                                     static_cast<uint16_t>(round(y)))[3] > 0;
+
+        if (!collision) {
+            continue;
+        }
+
+        this->explode_projectile(prj, x, y);
+        return true;
+    }
+
+    return false;
 }
 
-void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj) {
+void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, float x, float y) {
     auto explosion = std::make_shared<ExplosionUpdate>(ExplosionUpdate{});
     explosion->projectile_id = prj->projectile_id;
     explosion->projectile_type = prj->projectile_type;
-    explosion->explosion_size = 32;
-    explosion->x = this->clamp_x<>(prj->position.x);
-    explosion->y = this->clamp_y<>(prj->position.y);
+    explosion->explosion_size = 4;
+    explosion->x = this->clamp_x<>(x);
+    explosion->y = this->clamp_y<>(y);
     this->explosions.push_back(explosion);
 
     this->apply_explosion(explosion);
@@ -160,8 +179,9 @@ void MatchServer::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
             ServerProjectile(player->player_id,
                              projectile_id,
                              1,
-                             player->front_position(),
-                             glm::rotate(glm::vec2(0.0f, -220.0f), rotation_rad)));
+                             player->position,
+                             player->velocity +
+                                     glm::rotate(glm::vec2(0.0f, -220.0f), rotation_rad)));
 
     this->projectiles[projectile_id] = projectile;
 }
@@ -198,7 +218,6 @@ void MatchServer::update(float dt) {
 
         projectile->update(dt);
         if (this->check_projectile_collisions(projectile)) {
-            this->explode_projectile(projectile);
             it = this->projectiles.erase(it);
         } else {
             ++it;
