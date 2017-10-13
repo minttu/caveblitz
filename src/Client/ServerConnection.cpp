@@ -61,10 +61,6 @@ void ServerConnection::tick() {
             break;
         }
     }
-
-    if (this->packets_processed_in_tick == 0) {
-        std::cerr << "skip\n";
-    }
 }
 
 void ServerConnection::join_server() {

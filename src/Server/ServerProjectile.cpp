@@ -16,7 +16,6 @@ ServerProjectile::ServerProjectile(PlayerID player_id,
 void ServerProjectile::update(float dt) {
     this->previous_position = this->position;
 
+    this->velocity += glm::vec2(0, 40.0f * dt);
     this->position += this->velocity * dt;
-
-    // this->velocity *= (0.95f * 60 * dt);
 }

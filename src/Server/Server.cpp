@@ -29,6 +29,11 @@ void Server::run(const bool *should_run) {
     float dt = 0;
     ENetEvent event{};
 
+    auto last_time = std::chrono::high_resolution_clock::now();
+    auto start_time = last_time;
+    std::chrono::duration<double, std::ratio<1, 60>> tick_duration(1);
+    uint32_t ticks = 0;
+
     while (*should_run) {
         while (enet_host_service(this->server, &event, 0) > 0) {
             switch (event.type) {
@@ -73,8 +78,22 @@ void Server::run(const bool *should_run) {
         enet_host_flush(this->server);
 
         // sleep
-        dt = 1.0f / 60.0f;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
+        ticks++;
+        auto current_time = std::chrono::high_resolution_clock::now();
+        auto delta_time =
+                std::chrono::duration_cast<std::chrono::microseconds>(current_time - last_time);
+        last_time = current_time;
+        auto target_time = start_time + (ticks * tick_duration);
+
+        dt = delta_time.count() / 1000.0f / 1000.0f;
+
+        if (current_time <= target_time) {
+            std::this_thread::sleep_for(target_time - current_time);
+        } else {
+            std::cerr << "server no sleep\n";
+            ticks = 0;
+            start_time = last_time;
+        }
     }
 }
 

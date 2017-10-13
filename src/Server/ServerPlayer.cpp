@@ -15,14 +15,15 @@ void ServerPlayer::update(float dt, float thrust, float rotation) {
     this->previous_position = this->position;
     this->primary_ready += dt;
 
-    this->rotation -= rotation * 90 * dt;
-    auto rotation_rad = this->rotation * glm::pi<float>() / 180;
-    this->velocity += glm::rotate(glm::vec2(0.0f, -thrust * dt), rotation_rad);
+    this->rotation -= rotation * 120.0f * dt;
+    auto rotation_rad = this->rotation * glm::pi<float>() / 180.0f;
+    this->velocity += glm::rotate(glm::vec2(0.0f, -thrust * dt * 60.0f), rotation_rad);
+    this->velocity += glm::vec2(0, 3.0f * dt);
     if (!this->colliding) {
-        this->position += this->velocity * this->speed;
+        this->position += this->velocity * this->speed * dt;
     }
     this->colliding = false;
-    this->velocity *= (0.95f * 60 * dt);
+    this->velocity -= this->velocity * (dt * 2.0f);
 }
 
 void ServerPlayer::collide(float /*unused*/, float /*unused*/, float /*unused*/) {
