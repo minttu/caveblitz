@@ -3,7 +3,8 @@
 const int MAX_PLAYERS = 8;
 
 MatchServer::MatchServer() {
-    this->bg = read_png("assets/maps/abstract/dynamic.png");
+    this->map_name = "abstract";
+    this->dynamic_image = read_png("assets/maps/" + this->map_name + "/dynamic.png");
 }
 
 std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
@@ -18,7 +19,7 @@ std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
     auto join_info = std::make_shared<ServerJoinInfo>(ServerJoinInfo{});
     join_info->player_id = player_id;
     memset(&join_info->map_name, 0, 32);
-    memcpy(&join_info->map_name, "abstract", 32);
+    memcpy(&join_info->map_name, this->map_name.c_str(), 32);
 
     return join_info;
 }
@@ -97,7 +98,7 @@ void MatchServer::check_player_collisions(std::shared_ptr<ServerPlayer> &player,
     auto px = this->clamp_x<>(player->position.x);
     auto py = this->clamp_y<>(player->position.y);
 
-    auto pos = this->bg.at(px, py);
+    auto pos = this->dynamic_image.at(px, py);
     if (pos[3] > 0) {
         player->collide(dt, px, py);
     }
@@ -119,8 +120,8 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
 
         auto over_map = x <= 0 || x >= max_x || y <= 0 || y >= max_y;
         auto collision = over_map ||
-                         this->bg.at(static_cast<uint16_t>(round(x)),
-                                     static_cast<uint16_t>(round(y)))[3] > 0;
+                         this->dynamic_image.at(static_cast<uint16_t>(round(x)),
+                                                static_cast<uint16_t>(round(y)))[3] > 0;
 
         if (!collision) {
             continue;
@@ -161,7 +162,7 @@ void MatchServer::apply_explosion(std::shared_ptr<ExplosionUpdate> &explosion) {
                     continue;
                 }
 
-                this->bg.inv(xx, yy);
+                this->dynamic_image.inv(xx, yy);
             }
         }
     }

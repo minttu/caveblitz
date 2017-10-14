@@ -18,7 +18,8 @@ class MatchServer {
 private:
     ProjectileID next_projectile_id = 0;
     PlayerID next_player_id = 0;
-    Image bg;
+    std::string map_name;
+    Image dynamic_image;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
     std::map<ProjectileID, std::shared_ptr<ServerProjectile>> projectiles;
@@ -39,12 +40,12 @@ private:
 
     template <typename T>
     T max_x() {
-        return static_cast<T>(this->bg.width - 1);
+        return static_cast<T>(this->dynamic_image.width - 1);
     }
 
     template <typename T>
     T max_y() {
-        return static_cast<T>(this->bg.height - 1);
+        return static_cast<T>(this->dynamic_image.height - 1);
     }
 
     template <typename T = uint32_t>

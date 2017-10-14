@@ -15,14 +15,15 @@ MatchScene::MatchScene(std::shared_ptr<Game> game,
 
     this->server_connection = std::move(server_connection);
     this->game = std::move(game);
-    this->initialize_layers();
 }
 
-void MatchScene::initialize_layers() {
+void MatchScene::initialize_layers(const std::string &name) {
+    std::string base_name = "assets/maps/" + name + "/";
+
     SDL2pp::Texture::LockHandle lock = this->dynamic_layer.Lock();
     auto start = static_cast<unsigned char *>(lock.GetPixels());
     int pitch = lock.GetPitch();
-    auto dynamic_image = read_png("assets/maps/abstract/dynamic.png");
+    auto dynamic_image = read_png(base_name + "dynamic.png");
     uint32_t y = 0;
     uint32_t x = 0;
     for (const auto &i : dynamic_image.data) {
@@ -115,6 +116,10 @@ bool MatchScene::gather_inputs() {
 }
 
 void MatchScene::draw(DeltaTime dt) {
+    if (this->state == MATCH_SCENE_LOADING) {
+        return;
+    }
+
     this->game->renderer.SetTarget(this->render_target);
     this->game->renderer.SetDrawColor(100, 149, 237, 255);
     this->game->renderer.Clear();
@@ -304,4 +309,12 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
 
 void MatchScene::handle_server_join_info(ServerJoinInfo sji) {
     this->player_ids.push_back(sji.player_id);
+
+    if (this->player_ids.size() > 1) {
+        return;
+    }
+
+    std::string map_name(reinterpret_cast<char *>(sji.map_name));
+    this->initialize_layers(map_name);
+    this->state = MATCH_SCENE_PLAYING;
 }
