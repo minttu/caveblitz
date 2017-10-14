@@ -2,9 +2,8 @@
 
 const int MAX_PLAYERS = 8;
 
-MatchServer::MatchServer() {
-    this->map_name = "abstract";
-    this->dynamic_image = read_png("assets/maps/" + this->map_name + "/dynamic.png");
+MatchServer::MatchServer() : map(std::make_shared<Map>(Map("abstract"))) {
+    this->dynamic_image = this->map->get_dynamic()->image();
 }
 
 std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
@@ -14,12 +13,14 @@ std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
 
     auto player_id = this->next_player_id++;
     auto player = std::make_shared<ServerPlayer>(ServerPlayer(player_id));
+    auto point = this->map->get_player_spawn(player_id);
+    player->position = glm::vec2(point->x, point->y);
     this->players[player_id] = player;
 
     auto join_info = std::make_shared<ServerJoinInfo>(ServerJoinInfo{});
     join_info->player_id = player_id;
     memset(&join_info->map_name, 0, 32);
-    memcpy(&join_info->map_name, this->map_name.c_str(), 32);
+    memcpy(&join_info->map_name, this->map->name.c_str(), 32);
 
     return join_info;
 }

@@ -31,6 +31,8 @@ INCLUDE_DIRECTORIES(
     ${ENET_INCLUDE_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/extlibs/GSL/include
     ${CMAKE_CURRENT_LIST_DIR}/extlibs/glm
+    ${CMAKE_CURRENT_LIST_DIR}/extlibs/rapidjson/include
+    ${CMAKE_CURRENT_LIST_DIR}/extlibs/CLI11/include
 )
 
 # Common
@@ -39,6 +41,7 @@ SET(
     COMMON_SOURCE_FILES
     src/Common/DataTransfer.h
     src/Common/Image.cpp src/Common/Image.h
+    src/Common/Map.cpp src/Common/Map.h
 )
 
 ADD_LIBRARY(caveblitz-common ${COMMON_SOURCE_FILES})

@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL.h>
 #include <enet/enet.h>
+#include <CLI/CLI.hpp>
 
 #undef main
 
@@ -14,20 +15,35 @@
 #include "Server/Server.h"
 
 void server_runner(const bool *should_run) {
+    if (*should_run == false) {
+        return;
+    }
+
     Server server;
     server.run(should_run);
 }
 
-int main() {
+int main(int argc, char **argv) {
     if (enet_initialize() != 0) {
         std::cerr << "enet_initialize failed\n";
         return 1;
     }
     atexit(enet_deinitialize);
 
-    bool should_run = true;
+    CLI::App app("caveblitz");
 
-    std::thread server_thread(server_runner, &should_run);
+    bool run_server;
+    app.add_flag("-s,--server", run_server, "Start server");
+
+    std::string connect_host = "localhost";
+    app.add_option("-c,--connect", connect_host, "Host to connect to");
+
+    int connect_port = 30320;
+    app.add_option("-p,--port", connect_port, "Port to connect to");
+
+    CLI11_PARSE(app, argc, argv);
+
+    std::thread server_thread(server_runner, &run_server);
 
     SDL2pp::SDL sdl(SDL_INIT_VIDEO);
     SDL2pp::Window window("caveblitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
@@ -40,14 +56,14 @@ int main() {
 
     auto game = std::make_shared<Game>(Game(renderer));
 
-    auto server_connection = std::make_shared<ServerConnection>(ServerConnection());
+    auto server_connection = std::make_shared<ServerConnection>(ServerConnection(connect_host, connect_port));
 
     auto scene = std::make_shared<MatchScene>(MatchScene(game, server_connection));
 
     game->set_scene(scene);
     game->run();
 
-    should_run = false;
+    run_server = false;
 
     server_thread.join();
 

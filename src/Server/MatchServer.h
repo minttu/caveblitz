@@ -11,6 +11,7 @@
 
 #include "../Common/DataTransfer.h"
 #include "../Common/Image.h"
+#include "../Common/Map.h"
 #include "ServerPlayer.h"
 #include "ServerProjectile.h"
 
@@ -18,7 +19,7 @@ class MatchServer {
 private:
     ProjectileID next_projectile_id = 0;
     PlayerID next_player_id = 0;
-    std::string map_name;
+    std::shared_ptr<Map> map;
     Image dynamic_image;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;

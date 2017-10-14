@@ -65,9 +65,17 @@ void MatchScene::join_server() {
 }
 
 bool MatchScene::gather_inputs() {
+    SDL_Event e{};
+
     this->server_connection->input_data->clear();
 
     if (this->player_ids.empty()) {
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -77,7 +85,6 @@ bool MatchScene::gather_inputs() {
     input.thrust = 0;
     input.flags = 0;
 
-    SDL_Event e{};
     while (SDL_PollEvent(&e) != 0) {
         if (e.type == SDL_QUIT) {
             return false;

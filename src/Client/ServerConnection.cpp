@@ -1,6 +1,6 @@
 #include "ServerConnection.h"
 
-ServerConnection::ServerConnection()
+ServerConnection::ServerConnection(const std::string host, int port)
         : update_data(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())),
           input_data(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())) {
 
@@ -14,8 +14,8 @@ ServerConnection::ServerConnection()
         throw std::runtime_error("couldn't create enet client");
     }
     ENetAddress address{};
-    enet_address_set_host(&address, "localhost");
-    address.port = 30320;
+    enet_address_set_host(&address, host.c_str());
+    address.port = port;
     this->peer = enet_host_connect(this->client, &address, 3, 0);
     if (this->peer == nullptr) {
         throw std::runtime_error("couldn't create enet peer");

@@ -7,3 +7,9 @@
 [submodule "extlibs/glm"]
 	path = extlibs/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "extlibs/rapidjson"]
+	path = extlibs/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "extlibs/CLI11"]
+	path = extlibs/CLI11
+	url = https://github.com/CLIUtils/CLI11.git
