@@ -74,6 +74,16 @@ Map::Map(const std::string &name) : name(name) {
     }
 }
 
+std::shared_ptr<MapLayer> Map::get_background() {
+    for (auto const &layer : this->layers) {
+        if (layer->type == "background") {
+            return layer;
+        }
+    }
+
+    throw std::runtime_error("no background layer");
+}
+
 std::shared_ptr<MapLayer> Map::get_dynamic() {
     for (auto const &layer : this->layers) {
         if (layer->type == "dynamic") {

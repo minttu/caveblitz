@@ -7,6 +7,11 @@ MatchScene::MatchScene(std::shared_ptr<Game> game,
                         SDL_TEXTUREACCESS_STREAMING,
                         1024,
                         1024),
+          background_layer(game->renderer,
+                           SDL_PIXELFORMAT_ABGR8888,
+                           SDL_TEXTUREACCESS_STREAMING,
+                           1024,
+                           1024),
           render_target(game->renderer,
                         SDL_PIXELFORMAT_RGBA8888,
                         SDL_TEXTUREACCESS_TARGET,
@@ -17,13 +22,18 @@ MatchScene::MatchScene(std::shared_ptr<Game> game,
     this->game = std::move(game);
 }
 
-void MatchScene::initialize_layers(const std::string &name) {
-    std::string base_name = "assets/maps/" + name + "/";
+void MatchScene::load_map(const std::string &name) {
+    this->map = std::make_shared<Map>(Map(name));
 
+    this->load_dynamic_layer();
+    this->load_background_layer();
+}
+
+void MatchScene::load_dynamic_layer() {
     SDL2pp::Texture::LockHandle lock = this->dynamic_layer.Lock();
     auto start = static_cast<unsigned char *>(lock.GetPixels());
     int pitch = lock.GetPitch();
-    auto dynamic_image = read_png(base_name + "dynamic.png");
+    auto dynamic_image = this->map->get_dynamic()->image();
     uint32_t y = 0;
     uint32_t x = 0;
     for (const auto &i : dynamic_image.data) {
@@ -39,6 +49,28 @@ void MatchScene::initialize_layers(const std::string &name) {
     }
 
     this->dynamic_layer.SetBlendMode(SDL_BLENDMODE_BLEND);
+}
+
+void MatchScene::load_background_layer() {
+    SDL2pp::Texture::LockHandle lock = this->background_layer.Lock();
+    auto start = static_cast<unsigned char *>(lock.GetPixels());
+    int pitch = lock.GetPitch();
+    auto image = this->map->get_background()->image();
+    uint32_t y = 0;
+    uint32_t x = 0;
+    for (const auto &i : image.data) {
+        start[(x * 4) + (y * pitch) + 0] = i[0];
+        start[(x * 4) + (y * pitch) + 1] = i[1];
+        start[(x * 4) + (y * pitch) + 2] = i[2];
+        start[(x * 4) + (y * pitch) + 3] = i[3];
+        x++;
+        if (x == image.width) {
+            x = 0;
+            y++;
+        }
+    }
+
+    this->background_layer.SetBlendMode(SDL_BLENDMODE_BLEND);
 }
 
 bool MatchScene::tick(DeltaTime dt) {
@@ -128,8 +160,12 @@ void MatchScene::draw(DeltaTime dt) {
     }
 
     this->game->renderer.SetTarget(this->render_target);
-    this->game->renderer.SetDrawColor(100, 149, 237, 255);
+    this->game->renderer.SetDrawColor(0, 0, 0, 255);
     this->game->renderer.Clear();
+
+    this->game->renderer.Copy(this->background_layer,
+                              SDL2pp::Rect(0, 0, 1024, 1024),
+                              SDL2pp::Rect(0, 0, 1024, 1024));
 
     this->game->renderer.Copy(this->dynamic_layer,
                               SDL2pp::Rect(0, 0, 1024, 1024),
@@ -322,6 +358,6 @@ void MatchScene::handle_server_join_info(ServerJoinInfo sji) {
     }
 
     std::string map_name(reinterpret_cast<char *>(sji.map_name));
-    this->initialize_layers(map_name);
+    this->load_map(map_name);
     this->state = MATCH_SCENE_PLAYING;
 }
