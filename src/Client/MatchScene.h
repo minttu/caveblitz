@@ -45,7 +45,7 @@ public:
 
     bool gather_inputs();
 
-    bool tick(DeltaTime dt);
+    bool tick(DeltaTime dt) override;
 
     void join_server();
 

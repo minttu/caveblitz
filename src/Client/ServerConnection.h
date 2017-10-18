@@ -20,7 +20,7 @@ public:
 
     int packets_processed_in_tick;
 
-    ServerConnection(const std::string host, int port);
+    ServerConnection(std::string host, uint16_t port);
 
     bool connected{false};
 

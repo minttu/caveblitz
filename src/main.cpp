@@ -32,13 +32,13 @@ int main(int argc, char **argv) {
 
     CLI::App app("caveblitz");
 
-    bool run_server;
+    bool run_server = false;
     app.add_flag("-s,--server", run_server, "Start server");
 
     std::string connect_host = "localhost";
     app.add_option("-c,--connect", connect_host, "Host to connect to");
 
-    int connect_port = 30320;
+    uint16_t connect_port = 30320;
     app.add_option("-p,--port", connect_port, "Port to connect to");
 
     CLI11_PARSE(app, argc, argv);

@@ -95,6 +95,6 @@ std::shared_ptr<MapLayer> Map::get_dynamic() {
 }
 
 std::shared_ptr<PlayerSpawn> Map::get_player_spawn(uint16_t seed) {
-    int ind = seed % this->player_spawns.size();
+    auto ind = seed % this->player_spawns.size();
     return gsl::at(this->player_spawns, ind);
 }

@@ -30,7 +30,7 @@ public:
     float rotation;
     SDL2pp::Color color;
 
-    Ship(uint8_t player_id);
+    explicit Ship(uint8_t player_id);
 
     void draw(SDL2pp::Renderer *renderer, float dt) const;
 };

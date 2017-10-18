@@ -1,6 +1,6 @@
 #include "ServerConnection.h"
 
-ServerConnection::ServerConnection(const std::string host, int port)
+ServerConnection::ServerConnection(const std::string host, uint16_t port)
         : update_data(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())),
           input_data(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())) {
 
@@ -35,7 +35,7 @@ void ServerConnection::tick() {
     }
 
     this->packets_processed_in_tick = 0;
-    int wait = 10;
+    uint32_t wait = 10;
 
     ENetEvent event{};
     while (enet_host_service(this->client, &event, wait) > 0) {
