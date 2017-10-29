@@ -125,7 +125,7 @@ TARGET_COMPILE_DEFINITIONS(
 # Install
 
 ADD_CUSTOM_TARGET(
-    TARGET caveblitz PRE_BUILD
+    assets ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/assets
     $<TARGET_FILE_DIR:caveblitz>/assets
