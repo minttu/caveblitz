@@ -2,8 +2,8 @@
 
 MatchScene::MatchScene(std::shared_ptr<Game> game,
                        std::shared_ptr<ServerConnection> server_connection)
-        : map_width(1024),
-          map_height(1024),
+        : map_width(2),
+          map_height(2),
           dynamic_layer(game->renderer,
                         SDL_PIXELFORMAT_ABGR8888,
                         SDL_TEXTUREACCESS_STREAMING,
@@ -26,6 +26,25 @@ MatchScene::MatchScene(std::shared_ptr<Game> game,
 
 void MatchScene::load_map(const std::string &name) {
     this->map = std::make_shared<Map>(Map(name));
+
+    this->map_width = this->map->get_width();
+    this->map_height = this->map->get_height();
+
+    this->dynamic_layer = SDL2pp::Texture(this->game->renderer,
+                                          SDL_PIXELFORMAT_ABGR8888,
+                                          SDL_TEXTUREACCESS_STREAMING,
+                                          this->map_width,
+                                          this->map_height);
+    this->background_layer = SDL2pp::Texture(this->game->renderer,
+                                             SDL_PIXELFORMAT_ABGR8888,
+                                             SDL_TEXTUREACCESS_STREAMING,
+                                             this->map_width,
+                                             this->map_height);
+    this->render_target = SDL2pp::Texture(this->game->renderer,
+                                          SDL_PIXELFORMAT_ABGR8888,
+                                          SDL_TEXTUREACCESS_TARGET,
+                                          this->map_width,
+                                          this->map_height);
 
     this->load_dynamic_layer();
     this->load_background_layer();

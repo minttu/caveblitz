@@ -72,6 +72,24 @@ Map::Map(const std::string &name) : name(name) {
             this->layers.push_back(ml);
         }
     }
+
+    {
+        const rapidjson::Value &width = doc["width"];
+        if (!width.IsInt()) {
+            throw std::runtime_error("width not int");
+        }
+
+        this->width = width.GetInt();
+    }
+
+    {
+        const rapidjson::Value &height = doc["height"];
+        if (!height.IsInt()) {
+            throw std::runtime_error("height not int");
+        }
+
+        this->height = height.GetInt();
+    }
 }
 
 std::shared_ptr<MapLayer> Map::get_background() {
@@ -97,4 +115,12 @@ std::shared_ptr<MapLayer> Map::get_dynamic() {
 std::shared_ptr<PlayerSpawn> Map::get_player_spawn(uint16_t seed) {
     auto ind = seed % this->player_spawns.size();
     return gsl::at(this->player_spawns, ind);
+}
+
+int Map::get_width() {
+    return this->width;
+}
+
+int Map::get_height() {
+    return this->height;
 }
