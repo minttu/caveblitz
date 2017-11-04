@@ -18,6 +18,9 @@ enum MatchSceneState { MATCH_SCENE_LOADING = 1, MATCH_SCENE_PLAYING = 2 };
 
 class MatchScene : public Scene {
 private:
+    int map_width;
+    int map_height;
+
     std::shared_ptr<Game> game;
     std::shared_ptr<ServerConnection> server_connection;
     std::vector<PlayerID> player_ids;

@@ -36,6 +36,8 @@ public:
 
     void set_scene(std::shared_ptr<Scene> scene);
 
+    SDL2pp::Point window_size() const;
+
     void run();
 };
 

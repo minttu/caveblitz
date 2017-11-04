@@ -2,21 +2,23 @@
 
 MatchScene::MatchScene(std::shared_ptr<Game> game,
                        std::shared_ptr<ServerConnection> server_connection)
-        : dynamic_layer(game->renderer,
+        : map_width(1024),
+          map_height(1024),
+          dynamic_layer(game->renderer,
                         SDL_PIXELFORMAT_ABGR8888,
                         SDL_TEXTUREACCESS_STREAMING,
-                        1024,
-                        1024),
+                        map_width,
+                        map_height),
           background_layer(game->renderer,
                            SDL_PIXELFORMAT_ABGR8888,
                            SDL_TEXTUREACCESS_STREAMING,
-                           1024,
-                           1024),
+                           map_width,
+                           map_height),
           render_target(game->renderer,
                         SDL_PIXELFORMAT_RGBA8888,
                         SDL_TEXTUREACCESS_TARGET,
-                        1024,
-                        1024) {
+                        map_width,
+                        map_height) {
 
     this->server_connection = std::move(server_connection);
     this->game = std::move(game);
@@ -164,12 +166,12 @@ void MatchScene::draw(DeltaTime dt) {
     this->game->renderer.Clear();
 
     this->game->renderer.Copy(this->background_layer,
-                              SDL2pp::Rect(0, 0, 1024, 1024),
-                              SDL2pp::Rect(0, 0, 1024, 1024));
+                              SDL2pp::Rect(0, 0, map_width, map_height),
+                              SDL2pp::Rect(0, 0, map_width, map_height));
 
     this->game->renderer.Copy(this->dynamic_layer,
-                              SDL2pp::Rect(0, 0, 1024, 1024),
-                              SDL2pp::Rect(0, 0, 1024, 1024));
+                              SDL2pp::Rect(0, 0, map_width, map_height),
+                              SDL2pp::Rect(0, 0, map_width, map_height));
 
     for (const auto &x : this->projectiles) {
         auto projectile = x.second;
@@ -184,17 +186,24 @@ void MatchScene::draw(DeltaTime dt) {
     this->game->renderer.SetTarget();
     this->game->renderer.Clear();
 
+    auto size = this->game->window_size();
+
     if (!this->player_ids.empty() && !this->ships.empty() &&
         this->ships.find(this->player_ids[0]) != this->ships.end()) {
 
         auto ship = this->ships[this->player_ids[0]];
-        SDL2pp::Rect view(std::round(std::max(std::min(ship->x - 320, 1024.0f - 640.0f), 0.0f)),
-                          std::round(std::max(std::min(ship->y - 240, 1024.0f - 480.0f), 0.0f)),
-                          640,
-                          480);
+        SDL2pp::Rect view(std::round(std::max(std::min(ship->x - size.GetX() / 2,
+                                                       static_cast<float>(map_width) - size.GetX()),
+                                              0.0f)),
+                          std::round(
+                                  std::max(std::min(ship->y - size.GetY() / 2,
+                                                    static_cast<float>(map_height) - size.GetY()),
+                                           0.0f)),
+                          size.GetX(),
+                          size.GetY());
         this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
     } else {
-        SDL2pp::Rect view(0, 0, 640, 480);
+        SDL2pp::Rect view(0, 0, size.GetX(), size.GetY());
         this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
     }
 
@@ -306,7 +315,7 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
                 diameter_squared) {
                 auto xx = x - diameter + eu.x;
                 auto yy = y - diameter + eu.y;
-                auto ok = (xx >= 0 && yy >= 0 && xx <= 1023 && yy <= 1023);
+                auto ok = (xx >= 0 && yy >= 0 && xx <= map_width - 1 && yy <= map_height - 1);
                 offs[offs_offset] = ok;
                 if (ok) {
                     if (xx < min_x) {

@@ -19,6 +19,10 @@ void Game::set_scene(std::shared_ptr<Scene> scene) {
     this->scene = std::move(scene);
 }
 
+SDL2pp::Point Game::window_size() const {
+    return this->renderer.GetOutputSize();
+}
+
 void Game::run() {
     DeltaTime dt = 0.0f;
 
