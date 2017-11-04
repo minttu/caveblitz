@@ -100,6 +100,10 @@ Image read_png(const std::string &file_name) {
             }
         }
 
+        for (uint32_t row = 0; row < height; row++) {
+            png_free(png_ptr, row_pointers[row]);
+        }
+
         png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
         fclose(fp);
     } catch (const std::runtime_error &e) {
