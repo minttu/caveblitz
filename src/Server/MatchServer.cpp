@@ -20,7 +20,7 @@ std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
     auto join_info = std::make_shared<ServerJoinInfo>(ServerJoinInfo{});
     join_info->player_id = player_id;
     memset(&join_info->map_name, 0, 32);
-    memcpy(&join_info->map_name, this->map->name.c_str(), 32);
+    strncpy(reinterpret_cast<char *>(&join_info->map_name[0]), this->map->name.c_str(), 32);
 
     return join_info;
 }
