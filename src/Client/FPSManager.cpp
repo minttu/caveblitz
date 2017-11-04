@@ -8,6 +8,9 @@ FPSManager::FPSManager() {
     this->rate_ticks = 1000.0f / static_cast<float>(this->rate);
     this->base_ticks = SDL_GetTicks();
     this->last_ticks = this->base_ticks;
+    for (auto i = 0; i < (sizeof(this->last) / sizeof(this->last[0])); i++) {
+        this->last[i] = 0;
+    }
 }
 
 DeltaTime FPSManager::delay() {
@@ -26,5 +29,19 @@ DeltaTime FPSManager::delay() {
         this->base_ticks = SDL_GetTicks();
     }
 
+    if (this->last_index == (sizeof(this->last) / sizeof(this->last[0]))) {
+        this->last_index = 0;
+    }
+    this->last[this->last_index++] = time_passed;
+
     return time_passed;
+}
+
+float FPSManager::fps() const {
+    float sum = 0;
+    for (float i : this->last) {
+        sum += i;
+    }
+
+    return 1.0f / (sum / static_cast<float>(sizeof(this->last) / sizeof(this->last[0])));
 }

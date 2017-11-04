@@ -10,6 +10,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+#include <SDL2pp/Font.hh>
 #include <SDL2pp/Renderer.hh>
 #include <SDL2pp/SDL.hh>
 #include <SDL2pp/Surface.hh>
@@ -27,6 +28,7 @@ private:
 
 public:
     SDL2pp::Renderer &renderer;
+    std::shared_ptr<SDL2pp::Font> font;
 
     explicit Game(SDL2pp::Renderer &renderer);
     ~Game() = default;
@@ -40,6 +42,8 @@ public:
     SDL2pp::Point window_size() const;
 
     void run();
+
+    float fps() const;
 };
 
 #endif // CAVEBLITZ_GAME_H

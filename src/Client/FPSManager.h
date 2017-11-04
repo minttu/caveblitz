@@ -12,10 +12,14 @@ public:
     uint32_t base_ticks;
     uint32_t last_ticks;
     uint32_t rate;
+    size_t last_index{0};
+    DeltaTime last[15];
 
     FPSManager();
 
     DeltaTime delay();
+
+    float fps() const;
 };
 
 #endif // CAVEBLITZ_FPSMANAGER_H

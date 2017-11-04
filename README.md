@@ -9,6 +9,8 @@ Game where you fly and shoot in a cave.
 * `libpng 1.6`
 * `SDL2`
 * `SDL2_image`
+* `SDL2_ttf`
+* `SDL2_mixer`
 * `enet 1.3`
 * `git submodule init; git submodule update`
 

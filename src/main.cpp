@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <enet/enet.h>
 #include <CLI/CLI.hpp>
+#include <SDL2pp/SDLTTF.hh>
 
 #undef main
 
@@ -46,6 +47,7 @@ int main(int argc, char **argv) {
     std::thread server_thread(server_runner, &run_server);
 
     SDL2pp::SDL sdl(SDL_INIT_VIDEO);
+    SDL2pp::SDLTTF ttf;
     SDL2pp::Window window("caveblitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
     SDL2pp::Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 

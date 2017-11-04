@@ -45,6 +45,8 @@ private:
 
     void load_background_layer();
 
+    void draw_debug();
+
 public:
     MatchScene(std::shared_ptr<Game> game, std::shared_ptr<ServerConnection> server_connection);
 

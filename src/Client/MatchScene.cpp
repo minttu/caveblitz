@@ -231,7 +231,29 @@ void MatchScene::draw(DeltaTime dt) {
         this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
     }
 
+    this->draw_debug();
+
     this->game->renderer.Present();
+}
+
+void MatchScene::draw_debug() {
+    auto fps_str = "" + std::to_string((int)round(this->game->fps())) + " fps";
+    auto fps_texture =
+            SDL2pp::Texture(this->game->renderer,
+                            this->game->font->RenderText_Solid(fps_str,
+                                                               SDL2pp::Color{255, 255, 255, 255}));
+    this->game->renderer.Copy(fps_texture,
+                              SDL2pp::NullOpt,
+                              SDL2pp::Rect(0, 0, fps_texture.GetWidth(), fps_texture.GetHeight()));
+
+    auto upf_str = "" + std::to_string(this->server_connection->packets_processed_in_tick) + " upf";
+    auto upf_texture =
+            SDL2pp::Texture(this->game->renderer,
+                            this->game->font->RenderText_Solid(upf_str,
+                                                               SDL2pp::Color{255, 255, 255, 255}));
+    this->game->renderer.Copy(upf_texture,
+                              SDL2pp::NullOpt,
+                              SDL2pp::Rect(50, 0, upf_texture.GetWidth(), upf_texture.GetHeight()));
 }
 
 void MatchScene::handle_update() {
