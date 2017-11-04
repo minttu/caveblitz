@@ -4,6 +4,7 @@ MatchScene::MatchScene(std::shared_ptr<Game> game,
                        std::shared_ptr<ServerConnection> server_connection)
         : map_width(2),
           map_height(2),
+          should_quit(false),
           dynamic_layer(game->renderer,
                         SDL_PIXELFORMAT_ABGR8888,
                         SDL_TEXTUREACCESS_STREAMING,
@@ -95,6 +96,10 @@ void MatchScene::load_background_layer() {
 }
 
 bool MatchScene::tick(DeltaTime dt) {
+    if (this->should_quit || this->server_connection->disconnected) {
+        return false;
+    }
+
     if (!this->gather_inputs()) {
         return false;
     }
@@ -238,6 +243,7 @@ void MatchScene::handle_update() {
     ProjectileUpdate projectile_update{};
     ExplosionUpdate explosion_update{};
     ServerJoinInfo server_join_info{};
+    ClientFatalError client_fatal_error{};
 
     while (offset < target.size()) {
         auto type = target[offset];
@@ -271,6 +277,11 @@ void MatchScene::handle_update() {
         case SERVER_JOIN_INFO:
             server_join_info.deserialize(span);
             this->handle_server_join_info(server_join_info);
+            break;
+        case CLIENT_FATAL_ERROR:
+            client_fatal_error.deserialize(span);
+            client_fatal_error.print();
+            this->server_connection->disconnect();
             break;
         default:
             break;

@@ -55,6 +55,7 @@ void ServerConnection::tick() {
             break;
         case ENET_EVENT_TYPE_DISCONNECT:
             this->connected = false;
+            this->disconnected = true;
             std::cerr << "disconnected!\n";
             break;
         default:
@@ -78,4 +79,8 @@ void ServerConnection::join_server() {
     enet_peer_send(this->peer, 2, packet);
 
     enet_host_flush(this->client);
+}
+
+void ServerConnection::disconnect() {
+    enet_peer_disconnect(this->peer, 0);
 }

@@ -23,8 +23,11 @@ public:
     ServerConnection(std::string host, uint16_t port);
 
     bool connected{false};
+    bool disconnected{false};
 
     void join_server();
+
+    void disconnect();
 
     void tick();
 };

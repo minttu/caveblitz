@@ -2,13 +2,27 @@
 
 const int MAX_PLAYERS = 8;
 
+JoinError::JoinError(uint8_t error_code) : std::runtime_error(""), error_code(error_code) {
+}
+
+ClientFatalError JoinError::to_client_fatal_error() const {
+    ClientFatalError err{};
+    err.error_code = this->error_code;
+    return err;
+}
+
 MatchServer::MatchServer() : map(std::make_shared<Map>(Map("abstract"))) {
     this->dynamic_image = this->map->get_dynamic()->image();
+    this->match_status = MATCH_WAITING;
 }
 
 std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
     if (this->players.size() >= MAX_PLAYERS) {
-        throw std::runtime_error("maximum players reached");
+        throw JoinError(CLIENT_FATAL_ERROR_SERVER_FULL);
+    }
+
+    if (this->match_status != MATCH_WAITING) {
+        throw JoinError(CLIENT_FATAL_ERROR_SERVER_STARTED);
     }
 
     auto player_id = this->next_player_id++;
@@ -21,6 +35,10 @@ std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
     join_info->player_id = player_id;
     memset(&join_info->map_name, 0, 32);
     strncpy(reinterpret_cast<char *>(&join_info->map_name[0]), this->map->name.c_str(), 32);
+
+    if (this->players.size() == 2) {
+        this->match_status = MATCH_PLAYING;
+    }
 
     return join_info;
 }
@@ -56,7 +74,10 @@ bool MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &inpu
             try {
                 auto join_info = this->join_server();
                 join_info->serialize(output);
-            } catch (const std::runtime_error &err) {
+            } catch (const JoinError &err) {
+                auto fatal = err.to_client_fatal_error();
+                fatal.print();
+                fatal.serialize(output);
                 break;
             }
             break;
@@ -189,6 +210,10 @@ void MatchServer::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
 }
 
 void MatchServer::update(float dt) {
+    if (this->match_status != MATCH_PLAYING) {
+        return;
+    }
+
     for (auto const &x : this->players) {
         auto id = x.first;
         auto player = x.second;

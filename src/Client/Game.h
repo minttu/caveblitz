@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include <SDL2/SDL.h>
@@ -21,7 +22,7 @@
 class Game {
 private:
     FPSManager fps_manager;
-    std::map<const char *, std::shared_ptr<SDL2pp::Texture>> textures;
+    std::unordered_map<const char *, std::shared_ptr<SDL2pp::Texture>> textures;
     std::shared_ptr<Scene> scene;
 
 public:

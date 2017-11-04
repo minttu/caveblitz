@@ -15,12 +15,21 @@
 #include "ServerPlayer.h"
 #include "ServerProjectile.h"
 
+class JoinError : public std::runtime_error {
+public:
+    JoinError(uint8_t error_code);
+    uint8_t error_code;
+
+    ClientFatalError to_client_fatal_error() const;
+};
+
 class MatchServer {
 private:
     ProjectileID next_projectile_id = 0;
     PlayerID next_player_id = 0;
     std::shared_ptr<Map> map;
     Image dynamic_image;
+    uint8_t match_status;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
     std::map<ProjectileID, std::shared_ptr<ServerProjectile>> projectiles;

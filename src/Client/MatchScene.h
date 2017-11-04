@@ -2,6 +2,7 @@
 #define CAVEBLITZ_CLIENT_MATCH_SCENE_H
 
 #include <iostream>
+#include <unordered_map>
 
 #include "FPSManager.h"
 #include "Game.h"
@@ -20,6 +21,7 @@ class MatchScene : public Scene {
 private:
     int map_width;
     int map_height;
+    bool should_quit;
 
     std::shared_ptr<Game> game;
     std::shared_ptr<ServerConnection> server_connection;
@@ -32,7 +34,7 @@ private:
     SDL2pp::Texture background_layer;
     SDL2pp::Texture render_target;
 
-    std::map<int32_t, bool> keys_held;
+    std::unordered_map<int32_t, bool> keys_held;
 
     std::map<PlayerID, std::shared_ptr<Ship>> ships;
     std::map<ProjectileID, std::shared_ptr<Projectile>> projectiles;

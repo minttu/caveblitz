@@ -87,10 +87,13 @@ enum ResponseDataType : uint8_t {
     SERVER_UPDATE = 2,
     PROJECTILE_UPDATE = 3,
     EXPLOSION_UPDATE = 4,
-    SERVER_JOIN_INFO = 5
+    SERVER_JOIN_INFO = 5,
+    CLIENT_FATAL_ERROR = 6
 };
 
-const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33};
+const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33, 1};
+
+enum MATCH_STATUS { MATCH_WAITING = 1, MATCH_PLAYING = 2, MATCH_ENDED = 3 };
 
 struct ServerUpdate {
     uint32_t frame;
@@ -255,5 +258,37 @@ struct ServerJoinInfo {
         memcpy(&map_name, target.data() + 2, 32);
     }
 };
+
+using ServerJoinInfo = struct ServerJoinInfo;
+
+enum CLIENT_FATAL_ERRORS {
+    CLIENT_FATAL_ERROR_NO_ERROR = 0,
+    CLIENT_FATAL_ERROR_SERVER_FULL = 1,
+    CLIENT_FATAL_ERROR_SERVER_STARTED = 2
+};
+
+const static std::string CLIENT_FATAL_ERROR_MESSAGE[] = {"No error",
+                                                         "Match is full",
+                                                         "Match has already started"};
+
+struct ClientFatalError {
+    uint8_t error_code;
+
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(CLIENT_FATAL_ERROR));
+        target->push_back(error_code);
+    }
+
+    void deserialize(const gsl::span<uint8_t> &target) {
+        error_code = target[1];
+    }
+
+    void print() {
+        std::cerr << "Client fatal error: " << gsl::at(CLIENT_FATAL_ERROR_MESSAGE, error_code)
+                  << "\n";
+    }
+};
+
+using ClientFatalError = struct ClientFatalError;
 
 #endif // CAVEBLITZ_COMMON_DATA_TRANSFER_H

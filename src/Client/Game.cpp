@@ -4,7 +4,7 @@ Game::Game(SDL2pp::Renderer &renderer) : renderer(renderer) {
 }
 
 std::shared_ptr<SDL2pp::Texture> Game::load_texture(const char *path) {
-    if (this->textures.find(path) != this->textures.end()) {
+    if (this->textures.count(path) > 0) {
         return this->textures[path];
     }
 
