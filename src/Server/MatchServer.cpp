@@ -36,10 +36,6 @@ std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
     memset(&join_info->map_name, 0, 32);
     strncpy(reinterpret_cast<char *>(&join_info->map_name[0]), this->map->name.c_str(), 32);
 
-    if (this->players.size() == 2) {
-        this->match_status = MATCH_PLAYING;
-    }
-
     return join_info;
 }
 
@@ -99,6 +95,9 @@ bool MatchServer::handle_player_input(PlayerInput input) {
     }
 
     this->player_inputs[input.player_id] = input;
+    if ((input.flags & PLAYER_INPUT_SECONDARY_USE) != 0) {
+        this->players[input.player_id]->ready_to_play = true;
+    }
 
     return true;
 }
@@ -209,8 +208,28 @@ void MatchServer::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
     this->projectiles[projectile_id] = projectile;
 }
 
+void MatchServer::check_start() {
+    if (this->players.empty() || this->match_status != MATCH_WAITING) {
+        return;
+    }
+
+    auto ready_to_start = true;
+    for (auto const &x : this->players) {
+        auto player = x.second;
+        if (!player->ready_to_play) {
+            ready_to_start = false;
+            break;
+        }
+    }
+
+    if (ready_to_start) {
+        this->match_status = MATCH_PLAYING;
+    }
+}
+
 void MatchServer::update(float dt) {
     if (this->match_status != MATCH_PLAYING) {
+        this->check_start();
         return;
     }
 

@@ -48,6 +48,8 @@ private:
 
     void apply_explosion(std::shared_ptr<ExplosionUpdate> &explosion);
 
+    void check_start();
+
     template <typename T>
     T max_x() {
         return static_cast<T>(this->dynamic_image.width - 1);

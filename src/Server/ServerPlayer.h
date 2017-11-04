@@ -17,6 +17,7 @@ public:
     float rotation;
     bool colliding;
     float primary_ready;
+    bool ready_to_play{false};
 
     explicit ServerPlayer(PlayerID id);
 
