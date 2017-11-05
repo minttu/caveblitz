@@ -88,10 +88,12 @@ enum ResponseDataType : uint8_t {
     PROJECTILE_UPDATE = 3,
     EXPLOSION_UPDATE = 4,
     SERVER_JOIN_INFO = 5,
-    CLIENT_FATAL_ERROR = 6
+    CLIENT_FATAL_ERROR = 6,
+    PICKUP_SPAWN_UPDATE = 7,
+    PICKUP_DESPAWN_UPDATE = 8
 };
 
-const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33, 1};
+const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33, 1, 6, 1};
 
 enum MATCH_STATUS { MATCH_WAITING = 1, MATCH_PLAYING = 2, MATCH_ENDED = 3 };
 
@@ -290,5 +292,53 @@ struct ClientFatalError {
 };
 
 using ClientFatalError = struct ClientFatalError;
+
+using PickupID = uint8_t;
+using PickupType = uint8_t;
+
+struct PickupSpawnUpdate {
+    PickupID pickup_id;
+    PickupType pickup_type;
+    uint16_t x;
+    uint16_t y;
+
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(PICKUP_SPAWN_UPDATE));
+        target->push_back(pickup_id);
+        target->push_back(pickup_type);
+        Bytes2 data{};
+        data.i = x;
+        data.serialize(target);
+        data.i = y;
+        data.serialize(target);
+    }
+
+    void deserialize(const gsl::span<uint8_t> &target) {
+        pickup_id = target[1];
+        pickup_type = target[2];
+        Bytes2 data{};
+        data.deserialize(target, 3);
+        x = data.i;
+        data.deserialize(target, 5);
+        y = data.i;
+    }
+};
+
+using PickupSpawnUpdate = struct PickupSpawnUpdate;
+
+struct PickupDespawnUpdate {
+    PickupID pickup_id;
+
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(PICKUP_DESPAWN_UPDATE));
+        target->push_back(pickup_id);
+    }
+
+    void deserialize(const gsl::span<uint8_t> &target) {
+        pickup_id = target[1];
+    }
+};
+
+using PickupDespawnUpdate = struct PickupDespawnUpdate;
 
 #endif // CAVEBLITZ_COMMON_DATA_TRANSFER_H

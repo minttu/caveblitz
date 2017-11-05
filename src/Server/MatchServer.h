@@ -14,6 +14,7 @@
 #include "../Common/Map.h"
 #include "ServerPlayer.h"
 #include "ServerProjectile.h"
+#include "ServerPickup.h"
 
 class JoinError : public std::runtime_error {
 public:
@@ -33,6 +34,7 @@ private:
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
     std::map<ProjectileID, std::shared_ptr<ServerProjectile>> projectiles;
+    std::map<PickupID, std::shared_ptr<ServerPickup>> pickups;
     std::vector<std::shared_ptr<ExplosionUpdate>> explosions;
     std::map<PlayerID, PlayerInput> player_inputs;
 

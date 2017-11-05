@@ -8,8 +8,8 @@ FPSManager::FPSManager() {
     this->rate_ticks = 1000.0f / static_cast<float>(this->rate);
     this->base_ticks = SDL_GetTicks();
     this->last_ticks = this->base_ticks;
-    for (auto i = 0; i < (sizeof(this->last) / sizeof(this->last[0])); i++) {
-        this->last[i] = 0;
+    for (float &i : this->last) {
+        i = 0;
     }
 }
 
