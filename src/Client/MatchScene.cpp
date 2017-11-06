@@ -197,6 +197,11 @@ void MatchScene::draw(DeltaTime dt) {
                               SDL2pp::Rect(0, 0, map_width, map_height),
                               SDL2pp::Rect(0, 0, map_width, map_height));
 
+    for (const auto &x : this->pickups) {
+        auto pickup = x.second;
+        pickup->draw(&this->game->renderer);
+    }
+
     for (const auto &x : this->projectiles) {
         auto projectile = x.second;
         projectile->draw(&this->game->renderer);
@@ -266,6 +271,8 @@ void MatchScene::handle_update() {
     ExplosionUpdate explosion_update{};
     ServerJoinInfo server_join_info{};
     ClientFatalError client_fatal_error{};
+    PickupSpawnUpdate pickup_spawn_update{};
+    PickupDespawnUpdate pickup_despawn_update{};
 
     while (offset < target.size()) {
         auto type = target[offset];
@@ -299,6 +306,14 @@ void MatchScene::handle_update() {
         case SERVER_JOIN_INFO:
             server_join_info.deserialize(span);
             this->handle_server_join_info(server_join_info);
+            break;
+        case PICKUP_SPAWN_UPDATE:
+            pickup_spawn_update.deserialize(span);
+            this->handle_pickup_spawn_update(pickup_spawn_update);
+            break;
+        case PICKUP_DESPAWN_UPDATE:
+            pickup_despawn_update.deserialize(span);
+            this->handle_pickup_despawn_update(pickup_despawn_update);
             break;
         case CLIENT_FATAL_ERROR:
             client_fatal_error.deserialize(span);
@@ -421,4 +436,22 @@ void MatchScene::handle_server_join_info(ServerJoinInfo sji) {
     std::string map_name(reinterpret_cast<char *>(sji.map_name));
     this->load_map(map_name);
     this->state = MATCH_SCENE_PLAYING;
+}
+
+void MatchScene::handle_pickup_spawn_update(PickupSpawnUpdate psu) {
+    if (this->pickups.find(psu.pickup_id) == this->pickups.end()) {
+        auto created_pickup = std::make_shared<Pickup>(Pickup());
+        created_pickup->texture = this->game->load_texture("assets/pickup.png");
+        this->pickups[psu.pickup_id] = created_pickup;
+    }
+
+    auto pickup = this->pickups[psu.pickup_id];
+    pickup->x = psu.x;
+    pickup->y = psu.y;
+}
+
+void MatchScene::handle_pickup_despawn_update(PickupDespawnUpdate pdu) {
+    if (this->pickups.find(pdu.pickup_id) != this->pickups.end()) {
+        this->pickups.erase(pdu.pickup_id);
+    }
 }

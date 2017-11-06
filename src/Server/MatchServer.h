@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <random>
 #include <vector>
 
 #include <SDL2/SDL.h>
@@ -12,22 +13,16 @@
 #include "../Common/DataTransfer.h"
 #include "../Common/Image.h"
 #include "../Common/Map.h"
+#include "JoinError.h"
+#include "ServerPickup.h"
 #include "ServerPlayer.h"
 #include "ServerProjectile.h"
-#include "ServerPickup.h"
-
-class JoinError : public std::runtime_error {
-public:
-    JoinError(uint8_t error_code);
-    uint8_t error_code;
-
-    ClientFatalError to_client_fatal_error() const;
-};
 
 class MatchServer {
 private:
     ProjectileID next_projectile_id = 0;
     PlayerID next_player_id = 0;
+    PickupID next_pickup_id = 0;
     std::shared_ptr<Map> map;
     Image dynamic_image;
     uint8_t match_status;
@@ -36,6 +31,8 @@ private:
     std::map<ProjectileID, std::shared_ptr<ServerProjectile>> projectiles;
     std::map<PickupID, std::shared_ptr<ServerPickup>> pickups;
     std::vector<std::shared_ptr<ExplosionUpdate>> explosions;
+    std::vector<PickupID> spawned_pickups;
+    std::vector<PickupID> despawned_pickups;
     std::map<PlayerID, PlayerInput> player_inputs;
 
     bool handle_player_input(PlayerInput input);
@@ -51,6 +48,10 @@ private:
     void apply_explosion(std::shared_ptr<ExplosionUpdate> &explosion);
 
     void check_start();
+
+    void spawn_pickup();
+
+    void despawn_pickup(PickupID pickup_id);
 
     template <typename T>
     T max_x() {

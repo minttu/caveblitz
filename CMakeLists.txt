@@ -59,7 +59,9 @@ SET(
     src/Server/MatchServer.cpp src/Server/MatchServer.h
     src/Server/ServerPlayer.cpp src/Server/ServerPlayer.h
     src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
-        src/Server/ServerPickup.cpp src/Server/ServerPickup.h)
+    src/Server/ServerPickup.cpp src/Server/ServerPickup.h
+    src/Server/JoinError.cpp src/Server/JoinError.h
+)
 
 ADD_LIBRARY(caveblitz-server-lib ${SERVER_LIB_SOURCE_FILES})
 TARGET_LINK_LIBRARIES(
@@ -103,6 +105,7 @@ SET(
     src/Client/FPSManager.cpp src/Client/FPSManager.h
     src/Client/Projectile.cpp src/Client/Projectile.h
     src/Client/Scene.h
+    src/Client/Pickup.cpp src/Client/Pickup.h
 )
 
 ADD_EXECUTABLE(caveblitz ${CLIENT_SOURCE_FILES})

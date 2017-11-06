@@ -6,6 +6,7 @@
 
 #include "FPSManager.h"
 #include "Game.h"
+#include "Pickup.h"
 #include "Projectile.h"
 #include "Scene.h"
 #include "ServerConnection.h"
@@ -38,6 +39,7 @@ private:
 
     std::map<PlayerID, std::shared_ptr<Ship>> ships;
     std::map<ProjectileID, std::shared_ptr<Projectile>> projectiles;
+    std::map<PickupID, std::shared_ptr<Pickup>> pickups;
 
     void load_map(const std::string &name);
 
@@ -65,6 +67,10 @@ public:
     void handle_projectile_update(ProjectileUpdate pu);
 
     void handle_explosion_update(ExplosionUpdate eu);
+
+    void handle_pickup_spawn_update(PickupSpawnUpdate psu);
+
+    void handle_pickup_despawn_update(PickupDespawnUpdate pdu);
 
     void handle_server_join_info(ServerJoinInfo sji);
 };

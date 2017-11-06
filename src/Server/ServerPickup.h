@@ -13,5 +13,4 @@ public:
     ServerPickup(uint8_t pickup_id, uint8_t pickup_type, uint16_t x, uint16_t y);
 };
 
-
-#endif //CAVEBLITZ_SERVER_SERVER_PICKUP_H
+#endif // CAVEBLITZ_SERVER_SERVER_PICKUP_H
