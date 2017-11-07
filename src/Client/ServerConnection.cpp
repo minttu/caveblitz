@@ -35,7 +35,7 @@ void ServerConnection::tick() {
     }
 
     this->packets_processed_in_tick = 0;
-    uint32_t wait = 0;
+    uint32_t wait = 10;
 
     ENetEvent event{};
     while (enet_host_service(this->client, &event, wait) > 0) {

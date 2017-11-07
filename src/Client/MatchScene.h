@@ -23,6 +23,7 @@ private:
     int map_width;
     int map_height;
     bool should_quit;
+    int updates_in_frame{0};
 
     std::shared_ptr<Game> game;
     std::shared_ptr<ServerConnection> server_connection;

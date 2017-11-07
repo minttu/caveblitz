@@ -249,16 +249,17 @@ void MatchScene::draw_debug() {
                                                                SDL2pp::Color{255, 255, 255, 255}));
     this->game->renderer.Copy(fps_texture,
                               SDL2pp::NullOpt,
-                              SDL2pp::Rect(0, 0, fps_texture.GetWidth(), fps_texture.GetHeight()));
+                              SDL2pp::Rect(4, 0, fps_texture.GetWidth(), fps_texture.GetHeight()));
 
-    auto upf_str = "" + std::to_string(this->server_connection->packets_processed_in_tick) + " upf";
+    auto upf_str = "" + std::to_string(this->updates_in_frame) + " upf";
     auto upf_texture =
             SDL2pp::Texture(this->game->renderer,
                             this->game->font->RenderText_Solid(upf_str,
                                                                SDL2pp::Color{255, 255, 255, 255}));
+    this->updates_in_frame = 0;
     this->game->renderer.Copy(upf_texture,
                               SDL2pp::NullOpt,
-                              SDL2pp::Rect(50, 0, upf_texture.GetWidth(), upf_texture.GetHeight()));
+                              SDL2pp::Rect(54, 0, upf_texture.GetWidth(), upf_texture.GetHeight()));
 }
 
 void MatchScene::handle_update() {
@@ -324,6 +325,7 @@ void MatchScene::handle_update() {
             break;
         }
 
+        this->updates_in_frame += 1;
         offset += size;
     }
 }
