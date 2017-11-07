@@ -1,6 +1,6 @@
 #include "Server.h"
 
-Server::Server()
+Server::Server(uint16_t port)
         : update_data(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())),
           input_data(std::make_shared<std::vector<uint8_t>>(std::vector<uint8_t>())) {
     this->update_data->reserve(1024);
@@ -14,7 +14,7 @@ Server::Server()
 
     ENetAddress address{};
     address.host = ENET_HOST_ANY;
-    address.port = 30320;
+    address.port = port;
 
     this->server = enet_host_create(&address, 32, 3, 0, 0);
     if (this->server == nullptr) {
@@ -22,7 +22,7 @@ Server::Server()
         throw std::runtime_error("enet_host_create() failed");
     }
 
-    std::cerr << "host created\n";
+    std::cerr << "server listening on 0.0.0.0:" << std::to_string(port) << "\n";
 }
 
 void Server::run(const bool *should_run) {

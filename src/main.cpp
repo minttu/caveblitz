@@ -15,12 +15,14 @@
 
 #include "Server/Server.h"
 
-void server_runner(const bool *should_run) {
+#include "main.h"
+
+void server_runner(const bool *should_run, const uint16_t *port) {
     if (*should_run == false) {
         return;
     }
 
-    Server server;
+    Server server(*port);
     server.run(should_run);
 }
 
@@ -44,7 +46,7 @@ int main(int argc, char **argv) {
 
     CLI11_PARSE(app, argc, argv);
 
-    std::thread server_thread(server_runner, &run_server);
+    std::thread server_thread(server_runner, &run_server, &connect_port);
 
     SDL2pp::SDL sdl(SDL_INIT_VIDEO);
     SDL2pp::SDLTTF ttf;

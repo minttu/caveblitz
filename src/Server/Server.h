@@ -20,7 +20,7 @@ private:
     std::shared_ptr<MatchServer> match;
 
 public:
-    Server();
+    Server(uint16_t port);
     ~Server();
 
     void run(const bool *should_run);

@@ -22,4 +22,13 @@ Game where you fly and shoot in a cave.
 * `cd build`
 * `cmake ..`
 * `make`
-* `cp ../assets assets`
+
+## running
+
+To start a new game & server
+
+    ./caveblitz -s
+
+To join existing game
+
+    ./caveblitz -c 192.168.1.100

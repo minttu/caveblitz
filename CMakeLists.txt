@@ -97,7 +97,7 @@ TARGET_COMPILE_DEFINITIONS(
 
 SET(
     CLIENT_SOURCE_FILES
-    src/main.cpp
+    src/main.cpp src/main.h
     src/Client/Game.cpp src/Client/Game.h
     src/Client/MatchScene.cpp src/Client/MatchScene.h
     src/Client/ServerConnection.cpp src/Client/ServerConnection.h
