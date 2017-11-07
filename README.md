@@ -1,5 +1,7 @@
 # caveblitz
 
+[![CircleCI](https://circleci.com/gh/minttu/caveblitz/tree/master.svg?style=svg&circle-token=7eed1db17b9da6e44a085a2de652d81d9d41d50e)](https://circleci.com/gh/minttu/caveblitz/tree/master)
+
 Game where you fly and shoot in a cave.
 
 ## requirements
