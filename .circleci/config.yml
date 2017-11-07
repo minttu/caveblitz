@@ -6,14 +6,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: git submodules
-          command: git submodule update --init --recursive
-      - run:
           name: update apt
           command: apt-get update
       - run:
           name: install dependencies
-          command: apt-get -y install build-essential libgl1-mesa-dev libgles2-mesa-dev libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev libenet-dev libpng-dev cmake g++-7
+          command: apt-get -y install build-essential libgl1-mesa-dev libgles2-mesa-dev libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev libenet-dev libpng-dev cmake g++-7 git
+      - run:
+          name: git submodules
+          command: git submodule update --init --recursive
       - run:
           name: build
           command: mkdir -p build && cd build && cmake .. && make
