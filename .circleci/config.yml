@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: ubuntu:artful
+    steps:
+      - checkout
+      - run:
+          name: update apt
+          command: sudo apt-get update
+      - run:
+          name: install dependencies
+          command: sudo apt-get -y install build-essential libgl1-mesa-dev libgles2-mesa-dev libsdl2-dev libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-image-dev libenet-dev libpng-dev cmake g++-7
+      - run:
+          name: build
+          command: mkdir -p build && cd build && cmake .. && make
