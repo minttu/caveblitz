@@ -18,6 +18,7 @@ public:
     bool colliding;
     float primary_ready;
     bool ready_to_play{false};
+    uint8_t health{100};
 
     explicit ServerPlayer(PlayerID id);
 

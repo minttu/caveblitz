@@ -29,6 +29,7 @@ public:
     float y;
     float rotation;
     SDL2pp::Color color;
+    int health;
 
     explicit Ship(uint8_t player_id);
 

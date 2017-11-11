@@ -342,6 +342,7 @@ void MatchScene::handle_player_update(PlayerUpdate pu) {
     ship->x = pu.x;
     ship->y = pu.y;
     ship->rotation = pu.rotation;
+    ship->health = pu.health;
 }
 
 void MatchScene::handle_projectile_update(ProjectileUpdate pu) {

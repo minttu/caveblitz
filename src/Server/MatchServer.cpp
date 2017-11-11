@@ -146,18 +146,34 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
                          this->dynamic_image.at(static_cast<uint16_t>(round(x)),
                                                 static_cast<uint16_t>(round(y)))[3] > 0;
 
-        if (!collision) {
-            continue;
+        if (collision) {
+            this->explode_projectile(prj, x, y);
+            return true;
         }
 
-        this->explode_projectile(prj, x, y);
-        return true;
+        for (auto const &player_pair : this->players) {
+            auto player = player_pair.second;
+            if (player->player_id == prj->player_id) {
+                continue;
+            }
+            auto dist = sqrt(pow(x - player->position.x, 2) + pow(y - player->position.y, 2));
+            if (dist < 12) {
+                this->explode_projectile(prj, x, y);
+                player->health -= 1;
+                return true;
+            }
+        }
     }
 
     return false;
 }
 
 void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, float x, float y) {
+    if (prj->hit) {
+        return;
+    }
+    prj->hit = true;
+
     auto explosion = std::make_shared<ExplosionUpdate>(ExplosionUpdate{});
     explosion->projectile_id = prj->projectile_id;
     explosion->projectile_type = prj->projectile_type;
@@ -325,7 +341,7 @@ void MatchServer::serialize(const std::shared_ptr<std::vector<uint8_t>> &target)
         player_update.x = player->position.x;
         player_update.y = player->position.y;
         player_update.rotation = player->rotation;
-        player_update.health = 100;
+        player_update.health = player->health;
 
         player_update.serialize(target);
     }

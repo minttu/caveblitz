@@ -15,6 +15,8 @@ public:
     glm::vec2 previous_position;
     glm::vec2 velocity;
 
+    bool hit{false};
+
     ServerProjectile(PlayerID player_id,
                      ProjectileID projectile_id,
                      uint8_t projectile_type,
