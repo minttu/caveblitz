@@ -347,8 +347,8 @@ void MatchScene::handle_player_update(PlayerUpdate pu) {
 
 void MatchScene::handle_projectile_update(ProjectileUpdate pu) {
     if (this->projectiles.find(pu.projectile_id) == this->projectiles.end()) {
-        auto created_projectile = std::make_shared<Projectile>(Projectile());
-        created_projectile->texture = this->game->load_texture("assets/ship.png");
+        auto created_projectile = std::make_shared<Projectile>(Projectile(pu.projectile_type));
+        created_projectile->texture = this->game->load_texture("assets/projectiles.png");
         this->projectiles[pu.projectile_id] = created_projectile;
     }
 

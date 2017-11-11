@@ -13,6 +13,7 @@
 #include "../Common/DataTransfer.h"
 #include "../Common/Image.h"
 #include "../Common/Map.h"
+#include "../Common/PrimaryWeapon.h"
 #include "JoinError.h"
 #include "ServerPickup.h"
 #include "ServerPlayer.h"

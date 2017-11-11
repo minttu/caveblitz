@@ -120,6 +120,7 @@ void MatchServer::check_player_collisions(std::shared_ptr<ServerPlayer> &player,
         auto pickup = x.second;
         auto dist = sqrt(pow(pickup->x - px + 8, 2) + pow(pickup->y - py + 8, 2));
         if (dist < 24) {
+            player->primary_weapon = pickup->pickup_type;
             this->despawn_pickup(x.first);
             this->spawn_pickup();
             break;
@@ -159,7 +160,7 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
             auto dist = sqrt(pow(x - player->position.x, 2) + pow(y - player->position.y, 2));
             if (dist < 12) {
                 this->explode_projectile(prj, x, y);
-                player->health -= 1;
+                player->health -= prj->get_damage();
                 return true;
             }
         }
@@ -177,7 +178,7 @@ void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, flo
     auto explosion = std::make_shared<ExplosionUpdate>(ExplosionUpdate{});
     explosion->projectile_id = prj->projectile_id;
     explosion->projectile_type = prj->projectile_type;
-    explosion->explosion_size = 4;
+    explosion->explosion_size = prj->get_explosion_size();
     explosion->x = this->clamp_x<>(x);
     explosion->y = this->clamp_y<>(y);
     this->explosions.push_back(explosion);
@@ -212,16 +213,18 @@ void MatchServer::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
         return;
     }
 
-    player->primary_ready = -0.25f;
+    auto weapon = gsl::at(PRIMARY_WEAPONS, player->primary_weapon);
+
+    player->primary_ready = -weapon.cooldown;
     auto projectile_id = this->next_projectile_id++;
     auto rotation_rad = player->rotation * glm::pi<float>() / 180;
     auto projectile = std::make_shared<ServerProjectile>(
             ServerProjectile(player->player_id,
                              projectile_id,
-                             1,
+                             player->primary_weapon,
                              player->position,
                              player->velocity +
-                                     glm::rotate(glm::vec2(0.0f, -220.0f), rotation_rad)));
+                                     glm::rotate(glm::vec2(0.0f, -weapon.velocity), rotation_rad)));
 
     this->projectiles[projectile_id] = projectile;
 }
@@ -262,6 +265,8 @@ void MatchServer::spawn_pickup() {
     std::mt19937 mersenne(std::random_device{}());
     std::uniform_int_distribution<uint16_t> x_dist(1, this->max_x<uint16_t>());
     std::uniform_int_distribution<uint16_t> y_dist(1, this->max_x<uint16_t>());
+    std::uniform_int_distribution<uint8_t> primary_weapon_dist(
+            0, (sizeof(PRIMARY_WEAPONS) / sizeof(PRIMARY_WEAPONS[0])) - 1);
 
     uint16_t x = x_dist(mersenne);
     uint16_t y = y_dist(mersenne);
@@ -271,7 +276,8 @@ void MatchServer::spawn_pickup() {
         y = y_dist(mersenne);
     }
 
-    auto pickup = std::make_shared<ServerPickup>(ServerPickup(id, 1, x, y));
+    auto pickup =
+            std::make_shared<ServerPickup>(ServerPickup(id, primary_weapon_dist(mersenne), x, y));
     this->pickups[id] = pickup;
     this->spawned_pickups.push_back(id);
 }

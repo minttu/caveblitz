@@ -4,6 +4,7 @@
 #include <glm/vec2.hpp>
 
 #include "../Common/DataTransfer.h"
+#include "../Common/PrimaryWeapon.h"
 
 class ServerProjectile {
 public:
@@ -15,6 +16,8 @@ public:
     glm::vec2 previous_position;
     glm::vec2 velocity;
 
+    PrimaryWeapon primary_weapon;
+
     bool hit{false};
 
     ServerProjectile(PlayerID player_id,
@@ -24,6 +27,8 @@ public:
                      glm::vec2 velocity);
 
     void update(float dt);
+    uint8_t get_damage();
+    uint8_t get_explosion_size();
 };
 
 #endif // CAVEBLITZ_SERVER_SERVER_PROJECTILE_H

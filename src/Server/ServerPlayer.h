@@ -19,6 +19,7 @@ public:
     float primary_ready;
     bool ready_to_play{false};
     uint8_t health{100};
+    uint8_t primary_weapon{1};
 
     explicit ServerPlayer(PlayerID id);
 
