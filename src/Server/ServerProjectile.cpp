@@ -22,9 +22,9 @@ void ServerProjectile::update(float dt) {
 }
 
 uint8_t ServerProjectile::get_damage() {
-    return this->primary_weapon.damage;
+    return this->primary_weapon.projectile_type.damage;
 }
 
 uint8_t ServerProjectile::get_explosion_size() {
-    return this->primary_weapon.explosion_size;
+    return this->primary_weapon.projectile_type.explosion_size;
 }

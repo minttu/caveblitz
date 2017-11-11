@@ -31,7 +31,7 @@ void Server::run(const bool *should_run) {
 
     auto last_time = std::chrono::high_resolution_clock::now();
     auto start_time = last_time;
-    std::chrono::duration<double, std::ratio<1, 60>> tick_duration(1);
+    std::chrono::duration<double, std::ratio<1, 120>> tick_duration(1);
     uint32_t ticks = 0;
 
     while (*should_run) {

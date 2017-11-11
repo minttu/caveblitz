@@ -3,32 +3,23 @@
 
 #include <SDL2pp/Rect.hh>
 
+#include "ProjectileType.h"
+
 struct PrimaryWeapon {
-    SDL2pp::Rect texture_bounds;
-    uint8_t damage;
-    uint8_t explosion_size;
+    ProjectileType projectile_type;
     float cooldown;
     float velocity;
 
-    PrimaryWeapon(SDL2pp::Rect texture_bounds,
-                  uint8_t damage,
-                  uint8_t explosion_size,
-                  float cooldown,
-                  float velocity)
-            : texture_bounds(texture_bounds),
-              damage(damage),
-              explosion_size(explosion_size),
-              cooldown(cooldown),
-              velocity(velocity) {
+    PrimaryWeapon(ProjectileType projectile_type, float cooldown, float velocity)
+            : projectile_type(projectile_type), cooldown(cooldown), velocity(velocity) {
     }
 };
 using PrimaryWeapon = struct PrimaryWeapon;
 
-const static PrimaryWeapon PRIMARY_WEAPONS[] = {
-        PrimaryWeapon(SDL2pp::Rect(0, 0, 4, 4), 1, 2, 0.20f, 300.0f),
-        PrimaryWeapon(SDL2pp::Rect(4, 0, 4, 4), 2, 4, 0.25f, 220.0f),
-        PrimaryWeapon(SDL2pp::Rect(8, 0, 6, 6), 3, 4, 0.3f, 200.0f),
-        PrimaryWeapon(SDL2pp::Rect(14, 0, 6, 6), 5, 6, 0.4f, 180.0f),
-        PrimaryWeapon(SDL2pp::Rect(20, 0, 6, 6), 7, 8, 0.5f, 160.0f)};
+const static PrimaryWeapon PRIMARY_WEAPONS[] = {PrimaryWeapon(PROJECTILE_TYPES[0], 0.20f, 300.0f),
+                                                PrimaryWeapon(PROJECTILE_TYPES[1], 0.25f, 220.0f),
+                                                PrimaryWeapon(PROJECTILE_TYPES[2], 0.3f, 200.0f),
+                                                PrimaryWeapon(PROJECTILE_TYPES[3], 0.4f, 180.0f),
+                                                PrimaryWeapon(PROJECTILE_TYPES[4], 0.5f, 160.0f)};
 
 #endif // CAVEBLITZ_COMMON_PRIMARY_WEAPON_H

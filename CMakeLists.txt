@@ -43,6 +43,7 @@ SET(
     src/Common/Image.cpp src/Common/Image.h
     src/Common/Map.cpp src/Common/Map.h
     src/Common/PrimaryWeapon.h
+    src/Common/ProjectileType.h
 )
 
 ADD_LIBRARY(caveblitz-common ${COMMON_SOURCE_FILES})

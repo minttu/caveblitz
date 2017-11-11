@@ -32,3 +32,9 @@ To start a new game & server
 To join existing game
 
     ./caveblitz -c 192.168.1.100
+
+## controls
+
+* **Left, right and up arrows**: movement
+* **Right shift**: firing the primary weapon
+* **Down arrow**: start game (all connected players need to press this), firing the secondary weapon

@@ -12,17 +12,16 @@
 
 #include <gsl/gsl>
 
-#include "../Common/PrimaryWeapon.h"
+#include "../Common/ProjectileType.h"
 
 class Projectile {
 public:
     std::shared_ptr<SDL2pp::Texture> texture;
     float x;
     float y;
-    PrimaryWeapon primary_weapon;
-    uint8_t weapon_type;
+    ProjectileType projectile_type;
 
-    explicit Projectile(uint8_t weapon_type);
+    explicit Projectile(uint8_t projectile_type);
 
     void draw(SDL2pp::Renderer *renderer) const;
 };
