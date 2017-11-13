@@ -10,10 +10,11 @@ void Explosion::draw(SDL2pp::Renderer *renderer, float dt) {
         return;
     }
 
-    int offset = 0;
-    for (int i = 0; i <= size; i++) {
+    int offset = size == 1 ? 0 : -1;
+    for (int i = 0; i <= size - 1; i++) {
         offset += i + 1;
     }
+    std::cerr << std::to_string(this->size) << " " << std::to_string(offset) << "\n";
 
     SDL2pp::Rect src_rect(offset, 0, size, size);
 
