@@ -69,10 +69,12 @@ void Server::run(const bool *should_run) {
 
         this->update_data->clear();
         this->match->serialize_reliable(this->update_data);
-        update_packet = enet_packet_create(this->update_data->data(),
-                                           this->update_data->size(),
-                                           ENET_PACKET_FLAG_RELIABLE);
-        enet_host_broadcast(this->server, 1, update_packet);
+        if(!this->update_data->empty()) {
+            update_packet = enet_packet_create(this->update_data->data(),
+                                               this->update_data->size(),
+                                               ENET_PACKET_FLAG_RELIABLE);
+            enet_host_broadcast(this->server, 1, update_packet);
+        }
 
         // send
         enet_host_flush(this->server);
