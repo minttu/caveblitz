@@ -69,7 +69,7 @@ void Server::run(const bool *should_run) {
 
         this->update_data->clear();
         this->match->serialize_reliable(this->update_data);
-        if(!this->update_data->empty()) {
+        if (!this->update_data->empty()) {
             update_packet = enet_packet_create(this->update_data->data(),
                                                this->update_data->size(),
                                                ENET_PACKET_FLAG_RELIABLE);

@@ -157,10 +157,10 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
             if (player->player_id == prj->player_id) {
                 continue;
             }
+
             auto dist = sqrt(pow(x - player->position.x, 2) + pow(y - player->position.y, 2));
             if (dist < 12) {
                 this->explode_projectile(prj, x, y);
-                player->health -= prj->get_damage();
                 return true;
             }
         }
@@ -182,6 +182,17 @@ void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, flo
     explosion->x = this->clamp_x<>(x);
     explosion->y = this->clamp_y<>(y);
     this->explosions.push_back(explosion);
+    for (auto const &player_pair : this->players) {
+        auto player = player_pair.second;
+        if (player->player_id == prj->player_id) {
+            continue;
+        }
+
+        auto dist = sqrt(pow(x - player->position.x, 2) + pow(y - player->position.y, 2));
+        if (dist < 12 + (explosion->explosion_size / 2)) {
+            player->health -= prj->get_damage();
+        }
+    }
 
     this->apply_explosion(explosion);
 }
