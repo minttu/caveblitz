@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "Explosion.h"
 #include "FPSManager.h"
 #include "Game.h"
 #include "Pickup.h"
@@ -41,6 +42,7 @@ private:
     std::map<PlayerID, std::shared_ptr<Ship>> ships;
     std::map<ProjectileID, std::shared_ptr<Projectile>> projectiles;
     std::map<PickupID, std::shared_ptr<Pickup>> pickups;
+    std::vector<std::shared_ptr<Explosion>> explosions;
 
     void load_map(const std::string &name);
 

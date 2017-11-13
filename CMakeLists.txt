@@ -108,6 +108,7 @@ SET(
     src/Client/Projectile.cpp src/Client/Projectile.h
     src/Client/Scene.h
     src/Client/Pickup.cpp src/Client/Pickup.h
+    src/Client/Explosion.cpp src/Client/Explosion.h
 )
 
 ADD_EXECUTABLE(caveblitz ${CLIENT_SOURCE_FILES})

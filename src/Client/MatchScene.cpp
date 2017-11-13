@@ -212,6 +212,20 @@ void MatchScene::draw(DeltaTime dt) {
         ship->draw(&this->game->renderer, dt);
     }
 
+    for (const auto &x : this->explosions) {
+        x->draw(&this->game->renderer, dt);
+    }
+
+    for (auto it = this->explosions.begin(); it != this->explosions.end();) {
+        auto explosion = it->get();
+        explosion->draw(&this->game->renderer, dt);
+        if (explosion->destroy) {
+            it = this->explosions.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
     this->game->renderer.SetTarget();
     this->game->renderer.Clear();
 
@@ -365,6 +379,10 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
     if (eu.explosion_size == 0) {
         return;
     }
+
+    auto explosion = std::make_shared<Explosion>(eu.x, eu.y, eu.explosion_size);
+    explosion->texture = this->game->load_texture("assets/explosions.png");
+    this->explosions.push_back(explosion);
 
     auto diameter = eu.explosion_size / 2;
     auto diameter_squared = diameter * diameter;
