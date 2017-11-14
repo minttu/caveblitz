@@ -1,5 +1,5 @@
-#ifndef CAVEBLITZ_COMMON_PRIMARY_WEAPON_H
-#define CAVEBLITZ_COMMON_PRIMARY_WEAPON_H
+#ifndef CAVEBLITZ_SERVER_WEAPON_H
+#define CAVEBLITZ_SERVER_WEAPON_H
 
 #include <SDL2pp/Rect.hh>
 
@@ -57,4 +57,4 @@ const static Weapon WEAPONS[] = {Weapon(0.20f,
                                      return fire_primary_weapon(4, 160.0f, plr);
                                  })};
 
-#endif // CAVEBLITZ_COMMON_PRIMARY_WEAPON_H
+#endif // CAVEBLITZ_SERVER_WEAPON_H
