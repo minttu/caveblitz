@@ -125,7 +125,7 @@ using ServerUpdate = struct ServerUpdate;
 
 struct PlayerUpdate {
     PlayerID player_id;
-    uint8_t health;
+    int8_t health;
     float x;
     float y;
     float rotation;
@@ -133,7 +133,7 @@ struct PlayerUpdate {
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
         target->push_back(static_cast<uint8_t>(PLAYER_UPDATE));
         target->push_back(player_id);
-        target->push_back(health);
+        target->push_back(static_cast<uint8_t>(health));
         Bytes4 data{};
         data.f = x;
         data.serialize(target);

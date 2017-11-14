@@ -45,6 +45,7 @@ private:
     void explode_projectile(std::shared_ptr<ServerProjectile> &prj, float x, float y);
 
     void fire_primary(std::shared_ptr<ServerPlayer> &player);
+
     void fire_secondary(std::shared_ptr<ServerPlayer> &player);
 
     void apply_explosion(std::shared_ptr<ExplosionUpdate> &explosion);

@@ -12,6 +12,10 @@ ServerPlayer::ServerPlayer(PlayerID id)
 }
 
 void ServerPlayer::update(float dt, float thrust, float rotation) {
+    if (this->health <= 0) {
+        return;
+    }
+
     this->previous_position = this->position;
     this->primary_ready += dt;
     this->secondary_ready += dt;

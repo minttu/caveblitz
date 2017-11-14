@@ -327,9 +327,9 @@ void MatchServer::update(float dt) {
     this->spawned_pickups.clear();
     this->despawned_pickups.clear();
 
-    for (auto const &x : this->players) {
-        auto id = x.first;
-        auto player = x.second;
+    for (auto it = this->players.begin(); it != this->players.end();) {
+        auto id = it->first;
+        auto player = it->second;
         PlayerInput input{};
 
         try {
@@ -352,6 +352,12 @@ void MatchServer::update(float dt) {
 
         if ((input.flags & PLAYER_INPUT_SECONDARY_USE) != 0) {
             this->fire_secondary(player);
+        }
+
+        if (player->health <= 0) {
+            it = this->players.erase(it);
+        } else {
+            ++it;
         }
     }
 
