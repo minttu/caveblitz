@@ -62,7 +62,7 @@ SET(
     src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
     src/Server/ServerPickup.cpp src/Server/ServerPickup.h
     src/Server/JoinError.cpp src/Server/JoinError.h
-    src/Server/Weapon.h
+    src/Server/Weapon.cpp src/Server/Weapon.h
 )
 
 ADD_LIBRARY(caveblitz-server-lib ${SERVER_LIB_SOURCE_FILES})
