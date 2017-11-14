@@ -42,7 +42,7 @@ SET(
     src/Common/DataTransfer.h
     src/Common/Image.cpp src/Common/Image.h
     src/Common/Map.cpp src/Common/Map.h
-    src/Common/PrimaryWeapon.h
+        src/Common/Weapon.h
     src/Common/ProjectileType.h
 )
 

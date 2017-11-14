@@ -4,7 +4,7 @@
 #include <glm/vec2.hpp>
 
 #include "../Common/DataTransfer.h"
-#include "../Common/PrimaryWeapon.h"
+#include "../Common/ProjectileType.h"
 
 class ServerProjectile {
 public:
@@ -16,7 +16,7 @@ public:
     glm::vec2 previous_position;
     glm::vec2 velocity;
 
-    PrimaryWeapon primary_weapon;
+    ProjectileType projectile_type_struct;
 
     bool hit{false};
 

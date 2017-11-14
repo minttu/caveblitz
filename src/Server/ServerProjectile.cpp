@@ -11,7 +11,7 @@ ServerProjectile::ServerProjectile(PlayerID player_id,
           position(position),
           previous_position(position),
           velocity(velocity),
-          primary_weapon(gsl::at(PRIMARY_WEAPONS, projectile_type)) {
+          projectile_type_struct(gsl::at(PROJECTILE_TYPES, projectile_type)) {
 }
 
 void ServerProjectile::update(float dt) {
@@ -22,9 +22,9 @@ void ServerProjectile::update(float dt) {
 }
 
 uint8_t ServerProjectile::get_damage() {
-    return this->primary_weapon.projectile_type.damage;
+    return this->projectile_type_struct.damage;
 }
 
 uint8_t ServerProjectile::get_explosion_size() {
-    return this->primary_weapon.projectile_type.explosion_size;
+    return this->projectile_type_struct.explosion_size;
 }

@@ -224,7 +224,7 @@ void MatchServer::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
         return;
     }
 
-    auto weapon = gsl::at(PRIMARY_WEAPONS, player->primary_weapon);
+    auto weapon = gsl::at(WEAPONS, player->primary_weapon);
 
     player->primary_ready = -weapon.cooldown;
     auto projectile_id = this->next_projectile_id++;
@@ -276,8 +276,8 @@ void MatchServer::spawn_pickup() {
     std::mt19937 mersenne(std::random_device{}());
     std::uniform_int_distribution<uint16_t> x_dist(1, this->max_x<uint16_t>());
     std::uniform_int_distribution<uint16_t> y_dist(1, this->max_x<uint16_t>());
-    std::uniform_int_distribution<uint8_t> primary_weapon_dist(
-            0, (sizeof(PRIMARY_WEAPONS) / sizeof(PRIMARY_WEAPONS[0])) - 1);
+    std::uniform_int_distribution<uint8_t> weapon_dist(0,
+                                                       (sizeof(WEAPONS) / sizeof(WEAPONS[0])) - 1);
 
     uint16_t x = x_dist(mersenne);
     uint16_t y = y_dist(mersenne);
@@ -287,8 +287,7 @@ void MatchServer::spawn_pickup() {
         y = y_dist(mersenne);
     }
 
-    auto pickup =
-            std::make_shared<ServerPickup>(ServerPickup(id, primary_weapon_dist(mersenne), x, y));
+    auto pickup = std::make_shared<ServerPickup>(ServerPickup(id, weapon_dist(mersenne), x, y));
     this->pickups[id] = pickup;
     this->spawned_pickups.push_back(id);
 }
