@@ -5,6 +5,7 @@
 
 #include "../Common/DataTransfer.h"
 #include "../Common/ProjectileType.h"
+#include "ServerPlayer.h"
 
 class ServerProjectile {
 public:
@@ -19,6 +20,9 @@ public:
     ProjectileType projectile_type_struct;
 
     bool hit{false};
+
+    std::vector<std::shared_ptr<ServerProjectile>> (*on_hit)(std::shared_ptr<ServerProjectile> &prj,
+                                                             std::shared_ptr<ServerPlayer> &plr);
 
     ServerProjectile(PlayerID player_id,
                      ProjectileID projectile_id,

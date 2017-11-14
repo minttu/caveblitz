@@ -20,6 +20,9 @@ public:
     bool ready_to_play{false};
     uint8_t health{100};
     uint8_t primary_weapon{1};
+    float secondary_ready;
+    uint8_t secondary_weapon;
+    uint16_t secondary_ammo{0};
 
     explicit ServerPlayer(PlayerID id);
 

@@ -120,7 +120,16 @@ void MatchServer::check_player_collisions(std::shared_ptr<ServerPlayer> &player,
         auto pickup = x.second;
         auto dist = sqrt(pow(pickup->x - px + 8, 2) + pow(pickup->y - py + 8, 2));
         if (dist < 24) {
-            player->primary_weapon = pickup->pickup_type;
+            auto weapon = gsl::at(WEAPONS, pickup->pickup_type);
+            if (weapon.is_primary) {
+                player->primary_weapon = pickup->pickup_type;
+                player->primary_ready = weapon.cooldown;
+            } else {
+                player->secondary_weapon = pickup->pickup_type;
+                player->secondary_ammo = weapon.max_ammo;
+                player->secondary_ready = weapon.cooldown;
+            }
+
             this->despawn_pickup(x.first);
             this->spawn_pickup();
             break;
@@ -169,11 +178,22 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
     return false;
 }
 
+void MatchServer::create_projectiles(std::vector<std::shared_ptr<ServerProjectile>> projectiles) {
+    for (const auto &projectile : projectiles) {
+        auto projectile_id = this->next_projectile_id++;
+        projectile->projectile_id = projectile_id;
+        this->projectiles[projectile_id] = projectile;
+    }
+}
+
 void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, float x, float y) {
     if (prj->hit) {
         return;
     }
     prj->hit = true;
+    if (prj->on_hit) {
+        this->create_projectiles(prj->on_hit(prj, this->players[prj->player_id]));
+    }
 
     auto explosion = std::make_shared<ExplosionUpdate>(ExplosionUpdate{});
     explosion->projectile_id = prj->projectile_id;
@@ -219,7 +239,7 @@ void MatchServer::apply_explosion(std::shared_ptr<ExplosionUpdate> &explosion) {
     }
 }
 
-void MatchServer::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
+void MatchServer::fire_primary(std::shared_ptr<ServerPlayer> &player) {
     if (player->primary_ready < 0) {
         return;
     }
@@ -227,12 +247,18 @@ void MatchServer::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
     auto weapon = gsl::at(WEAPONS, player->primary_weapon);
 
     player->primary_ready = -weapon.cooldown;
-    auto projectiles = weapon.fire(player);
-    for (const auto &projectile : projectiles) {
-        auto projectile_id = this->next_projectile_id++;
-        projectile->projectile_id = projectile_id;
-        this->projectiles[projectile_id] = projectile;
+    this->create_projectiles(weapon.fire(player));
+}
+
+void MatchServer::fire_secondary(std::shared_ptr<ServerPlayer> &player) {
+    if (player->secondary_ready < 0 || player->secondary_ammo <= 0) {
+        return;
     }
+
+    auto weapon = gsl::at(WEAPONS, player->secondary_weapon);
+
+    player->secondary_ready = -weapon.cooldown;
+    this->create_projectiles(weapon.fire(player));
 }
 
 void MatchServer::check_start() {
@@ -271,6 +297,7 @@ void MatchServer::spawn_pickup() {
     std::mt19937 mersenne(std::random_device{}());
     std::uniform_int_distribution<uint16_t> x_dist(1, this->max_x<uint16_t>());
     std::uniform_int_distribution<uint16_t> y_dist(1, this->max_x<uint16_t>());
+    // TODO: make powerful weapons rarer
     std::uniform_int_distribution<uint8_t> weapon_dist(0,
                                                        (sizeof(WEAPONS) / sizeof(WEAPONS[0])) - 1);
 
@@ -320,7 +347,11 @@ void MatchServer::update(float dt) {
         this->check_player_collisions(player, dt);
 
         if ((input.flags & PLAYER_INPUT_PRIMARY_USE) != 0) {
-            this->fire_projectile(player);
+            this->fire_primary(player);
+        }
+
+        if ((input.flags & PLAYER_INPUT_SECONDARY_USE) != 0) {
+            this->fire_secondary(player);
         }
     }
 

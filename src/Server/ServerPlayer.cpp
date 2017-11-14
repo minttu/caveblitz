@@ -14,6 +14,7 @@ ServerPlayer::ServerPlayer(PlayerID id)
 void ServerPlayer::update(float dt, float thrust, float rotation) {
     this->previous_position = this->position;
     this->primary_ready += dt;
+    this->secondary_ready += dt;
 
     this->rotation -= rotation * 120.0f * dt;
     auto rotation_rad = this->rotation * glm::pi<float>() / 180.0f;

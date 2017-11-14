@@ -12,6 +12,7 @@ ServerProjectile::ServerProjectile(PlayerID player_id,
           previous_position(position),
           velocity(velocity),
           projectile_type_struct(gsl::at(PROJECTILE_TYPES, projectile_type)) {
+    this->on_hit = nullptr;
 }
 
 void ServerProjectile::update(float dt) {
