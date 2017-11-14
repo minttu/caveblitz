@@ -227,17 +227,12 @@ void MatchServer::fire_projectile(std::shared_ptr<ServerPlayer> &player) {
     auto weapon = gsl::at(WEAPONS, player->primary_weapon);
 
     player->primary_ready = -weapon.cooldown;
-    auto projectile_id = this->next_projectile_id++;
-    auto rotation_rad = player->rotation * glm::pi<float>() / 180;
-    auto projectile = std::make_shared<ServerProjectile>(
-            ServerProjectile(player->player_id,
-                             projectile_id,
-                             player->primary_weapon,
-                             player->position,
-                             player->velocity +
-                                     glm::rotate(glm::vec2(0.0f, -weapon.velocity), rotation_rad)));
-
-    this->projectiles[projectile_id] = projectile;
+    auto projectiles = weapon.fire(player);
+    for (const auto &projectile : projectiles) {
+        auto projectile_id = this->next_projectile_id++;
+        projectile->projectile_id = projectile_id;
+        this->projectiles[projectile_id] = projectile;
+    }
 }
 
 void MatchServer::check_start() {

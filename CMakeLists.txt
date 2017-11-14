@@ -42,7 +42,6 @@ SET(
     src/Common/DataTransfer.h
     src/Common/Image.cpp src/Common/Image.h
     src/Common/Map.cpp src/Common/Map.h
-        src/Common/Weapon.h
     src/Common/ProjectileType.h
 )
 
@@ -63,6 +62,7 @@ SET(
     src/Server/ServerProjectile.cpp src/Server/ServerProjectile.h
     src/Server/ServerPickup.cpp src/Server/ServerPickup.h
     src/Server/JoinError.cpp src/Server/JoinError.h
+    src/Server/Weapon.h
 )
 
 ADD_LIBRARY(caveblitz-server-lib ${SERVER_LIB_SOURCE_FILES})
