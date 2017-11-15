@@ -30,6 +30,8 @@ public:
 
     void collide(float dt, float x, float y);
 
+    void take_damage(uint8_t damage);
+
     glm::vec2 front_position() const;
 };
 

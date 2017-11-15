@@ -38,6 +38,13 @@ void ServerPlayer::collide(float /*unused*/, float /*unused*/, float /*unused*/)
     this->colliding = true;
 }
 
+void ServerPlayer::take_damage(uint8_t damage) {
+    this->health -= damage;
+    if (this->health < 0) {
+        this->health = 0;
+    }
+}
+
 glm::vec2 ServerPlayer::front_position() const {
     auto rotation_rad = this->rotation * glm::pi<float>() / 180;
     return this->position + glm::rotate(glm::vec2(0, -16.0f), rotation_rad);

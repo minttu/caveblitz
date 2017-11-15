@@ -163,7 +163,7 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
 
         for (auto const &player_pair : this->players) {
             auto player = player_pair.second;
-            if (player->player_id == prj->player_id) {
+            if (player->player_id == prj->player_id || player->health == 0) {
                 continue;
             }
 
@@ -204,13 +204,13 @@ void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, flo
     this->explosions.push_back(explosion);
     for (auto const &player_pair : this->players) {
         auto player = player_pair.second;
-        if (player->player_id == prj->player_id) {
+        if (player->player_id == prj->player_id || player->health == 0) {
             continue;
         }
 
         auto dist = sqrt(pow(x - player->position.x, 2) + pow(y - player->position.y, 2));
         if (dist < 12 + (explosion->explosion_size / 2)) {
-            player->health -= prj->get_damage();
+            player->take_damage(prj->get_damage());
         }
     }
 
@@ -327,9 +327,13 @@ void MatchServer::update(float dt) {
     this->spawned_pickups.clear();
     this->despawned_pickups.clear();
 
-    for (auto it = this->players.begin(); it != this->players.end();) {
-        auto id = it->first;
-        auto player = it->second;
+    for (auto const &it : this->players) {
+        auto id = it.first;
+        auto player = it.second;
+        if (player->health == 0) {
+            continue;
+        }
+
         PlayerInput input{};
 
         try {
@@ -352,12 +356,6 @@ void MatchServer::update(float dt) {
 
         if ((input.flags & PLAYER_INPUT_SECONDARY_USE) != 0) {
             this->fire_secondary(player);
-        }
-
-        if (player->health <= 0) {
-            it = this->players.erase(it);
-        } else {
-            ++it;
         }
     }
 

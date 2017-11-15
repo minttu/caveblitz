@@ -9,6 +9,10 @@ Ship::Ship(uint8_t player_id) {
 }
 
 void Ship::draw(SDL2pp::Renderer *renderer, float /*unused*/) const {
+    if (this->health == 0) {
+        return;
+    }
+
     SDL2pp::Rect src_rect(1, 1, 32, 32);
     SDL2pp::Rect rect(static_cast<int>(roundf(this->x) - 16),
                       static_cast<int>(roundf(this->y) - 16),
