@@ -14,13 +14,15 @@
 #include "../Common/Image.h"
 #include "../Common/Map.h"
 #include "../Common/ServerSentData.h"
+#include "GameMode.h"
 #include "JoinError.h"
+#include "Match.h"
 #include "ServerPickup.h"
 #include "ServerPlayer.h"
 #include "ServerProjectile.h"
 #include "Weapon.h"
 
-class MatchServer {
+class MatchServer : public Match {
 private:
     ProjectileID next_projectile_id = 0;
     PlayerID next_player_id = 0;
@@ -28,6 +30,7 @@ private:
     std::shared_ptr<Map> map;
     Image dynamic_image;
     uint8_t match_status;
+    GameMode *game_mode;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
     std::map<ProjectileID, std::shared_ptr<ServerProjectile>> projectiles;
@@ -93,6 +96,8 @@ public:
     void update(float dt);
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const;
     void serialize_reliable(const std::shared_ptr<std::vector<uint8_t>> &target) const;
+
+    std::vector<std::shared_ptr<ServerPlayer>> get_players() const override;
 };
 
 #endif // CAVEBLITZ_SERVER_MATCH_SERVER_H

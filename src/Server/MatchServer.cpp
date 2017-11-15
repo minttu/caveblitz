@@ -1,4 +1,6 @@
 #include "MatchServer.h"
+#include "FreeForAllGameMode.h"
+#include "GameMode.h"
 
 static const int MAX_PLAYERS = 8;
 static const int MAX_PICKUPS = 64;
@@ -6,6 +8,7 @@ static const int MAX_PICKUPS = 64;
 MatchServer::MatchServer() : map(std::make_shared<Map>(Map("abstract"))) {
     this->dynamic_image = this->map->get_dynamic()->image();
     this->match_status = MATCH_WAITING;
+    this->game_mode = new FreeForAllGameMode();
 }
 
 std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
@@ -191,7 +194,7 @@ void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, flo
         return;
     }
     prj->hit = true;
-    if (prj->on_hit) {
+    if (prj->on_hit != nullptr) {
         this->create_projectiles(prj->on_hit(prj, this->players[prj->player_id]));
     }
 
@@ -284,12 +287,16 @@ void MatchServer::check_start() {
         }
     }
 
-    if (ready_to_start) {
-        this->match_status = MATCH_PLAYING;
+    if (!ready_to_start) {
+        return;
+    }
 
-        for (int i = 0; i < 10; i++) {
-            this->spawn_pickup();
-        }
+    this->match_status = MATCH_PLAYING;
+
+    this->game_mode->match_start(*this);
+
+    for (int i = 0; i < 10; i++) {
+        this->spawn_pickup();
     }
 }
 
@@ -384,6 +391,10 @@ void MatchServer::update(float dt) {
     for (auto const &x : this->despawned_pickups) {
         this->pickups.erase(x);
     }
+
+    if (this->game_mode->match_tick(*this)) {
+        this->match_status = MATCH_ENDED;
+    }
 }
 
 void MatchServer::serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
@@ -434,4 +445,12 @@ void MatchServer::serialize_reliable(const std::shared_ptr<std::vector<uint8_t>>
         pickup_despawn_update.pickup_id = id;
         pickup_despawn_update.serialize(target);
     }
+}
+
+std::vector<std::shared_ptr<ServerPlayer>> MatchServer::get_players() const {
+    std::vector<std::shared_ptr<ServerPlayer>> ret;
+    for (auto const &x : this->players) {
+        ret.push_back(x.second);
+    }
+    return ret;
 }

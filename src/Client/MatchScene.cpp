@@ -181,7 +181,7 @@ bool MatchScene::gather_inputs() {
 }
 
 void MatchScene::draw(DeltaTime dt) {
-    if (this->state == MATCH_SCENE_LOADING) {
+    if (this->state != MATCH_SCENE_LOADING) {
         return;
     }
 

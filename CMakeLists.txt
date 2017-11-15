@@ -65,7 +65,9 @@ SET(
     src/Server/ServerPickup.cpp src/Server/ServerPickup.h
     src/Server/JoinError.cpp src/Server/JoinError.h
     src/Server/Weapon.cpp src/Server/Weapon.h
-)
+    src/Server/GameMode.h
+    src/Server/FreeForAllGameMode.cpp src/Server/FreeForAllGameMode.h
+        src/Server/Match.h)
 
 ADD_LIBRARY(caveblitz-server-lib ${SERVER_LIB_SOURCE_FILES})
 TARGET_LINK_LIBRARIES(
