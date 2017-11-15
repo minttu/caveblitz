@@ -211,10 +211,19 @@ void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, flo
         auto dist = sqrt(pow(x - player->position.x, 2) + pow(y - player->position.y, 2));
         if (dist < 12 + (explosion->explosion_size / 2)) {
             player->take_damage(prj->get_damage());
+            if (player->health == 0) {
+                this->player_death_explosion(player);
+            }
         }
     }
 
     this->apply_explosion(explosion);
+}
+
+void MatchServer::player_death_explosion(std::shared_ptr<ServerPlayer> &player) {
+    auto projectile = std::make_shared<ServerProjectile>(
+            ServerProjectile(player->player_id, 254, 5, player->position, glm::vec2()));
+    this->explode_projectile(projectile, player->position.x, player->position.y);
 }
 
 void MatchServer::apply_explosion(std::shared_ptr<ExplosionUpdate> &explosion) {

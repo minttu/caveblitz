@@ -18,6 +18,7 @@ const static ProjectileType PROJECTILE_TYPES[] = {ProjectileType(SDL2pp::Rect(0,
                                                   ProjectileType(SDL2pp::Rect(4, 0, 4, 4), 2, 4),
                                                   ProjectileType(SDL2pp::Rect(8, 0, 6, 6), 3, 4),
                                                   ProjectileType(SDL2pp::Rect(14, 0, 6, 6), 5, 6),
-                                                  ProjectileType(SDL2pp::Rect(20, 0, 6, 6), 7, 8)};
+                                                  ProjectileType(SDL2pp::Rect(20, 0, 6, 6), 7, 8),
+                                                  ProjectileType(SDL2pp::Rect(0, 0, 4, 4), 20, 32)};
 
 #endif // CAVEBLITZ_COMMON_PROJECTILE_TYPE_H

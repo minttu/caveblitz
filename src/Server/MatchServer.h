@@ -59,6 +59,8 @@ private:
 
     void create_projectiles(std::vector<std::shared_ptr<ServerProjectile>> projectiles);
 
+    void player_death_explosion(std::shared_ptr<ServerPlayer> &player);
+
     template <typename T>
     T max_x() {
         return static_cast<T>(this->dynamic_image.width - 1);
