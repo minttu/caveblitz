@@ -10,9 +10,10 @@
 #include <SDL2/SDL.h>
 #include <gsl/gsl>
 
-#include "../Common/DataTransfer.h"
+#include "../Common/ClientSentData.h"
 #include "../Common/Image.h"
 #include "../Common/Map.h"
+#include "../Common/ServerSentData.h"
 #include "JoinError.h"
 #include "ServerPickup.h"
 #include "ServerPlayer.h"

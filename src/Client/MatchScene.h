@@ -13,9 +13,10 @@
 #include "ServerConnection.h"
 #include "Ship.h"
 
-#include "../Common/DataTransfer.h"
+#include "../Common/ClientSentData.h"
 #include "../Common/Image.h"
 #include "../Common/Map.h"
+#include "../Common/ServerSentData.h"
 
 enum MatchSceneState { MATCH_SCENE_LOADING = 1, MATCH_SCENE_PLAYING = 2 };
 

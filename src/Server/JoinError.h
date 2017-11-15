@@ -1,7 +1,7 @@
 #ifndef CAVEBLITZ_SERVER_JOIN_ERROR_H
 #define CAVEBLITZ_SERVER_JOIN_ERROR_H
 
-#include "../Common/DataTransfer.h"
+#include "../Common/ServerSentData.h"
 #include <cstdint>
 
 class JoinError : public std::runtime_error {

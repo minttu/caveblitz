@@ -7,7 +7,7 @@
 
 #include <enet/enet.h>
 
-#include "../Common/DataTransfer.h"
+#include "../Common/ClientSentData.h"
 
 class ServerConnection {
 private:
