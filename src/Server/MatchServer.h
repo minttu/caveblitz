@@ -90,8 +90,8 @@ public:
 
     std::shared_ptr<ServerJoinInfo> join_server();
 
-    bool handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
-                      const std::shared_ptr<std::vector<uint8_t>> &output);
+    std::vector<PlayerID> handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
+                                       const std::shared_ptr<std::vector<uint8_t>> &output);
 
     void update(float dt);
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const;

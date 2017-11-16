@@ -34,11 +34,14 @@ std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
     return join_info;
 }
 
-bool MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
-                               const std::shared_ptr<std::vector<uint8_t>> &output) {
+std::vector<PlayerID>
+MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
+                          const std::shared_ptr<std::vector<uint8_t>> &output) {
     if (input->empty()) {
-        return true;
+        return std::vector<PlayerID>();
     }
+
+    std::vector<PlayerID> joined_players;
 
     PlayerInput player_input{};
     std::ptrdiff_t offset = 0;
@@ -47,7 +50,7 @@ bool MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &inpu
     while (offset < target.size()) {
         uint8_t type = target[offset];
         if (type >= sizeof(INPUT_DATA_SIZES) / sizeof(INPUT_DATA_SIZES[0])) {
-            return false;
+            break;
         }
 
         auto size = gsl::at(INPUT_DATA_SIZES, type) + 1;
@@ -56,7 +59,7 @@ bool MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &inpu
         switch (type) {
         case PLAYER_INPUT:
             if (!player_input.deserialize(span)) {
-                return false;
+                break;
             }
             this->handle_player_input(player_input);
 
@@ -65,6 +68,7 @@ bool MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &inpu
             try {
                 auto join_info = this->join_server();
                 join_info->serialize(output);
+                joined_players.push_back(join_info->player_id);
             } catch (const JoinError &err) {
                 auto fatal = err.to_client_fatal_error();
                 fatal.print();
@@ -73,13 +77,13 @@ bool MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &inpu
             }
             break;
         default:
-            return false;
+            break;
         }
 
         offset += size;
     }
 
-    return true;
+    return joined_players;
 }
 
 bool MatchServer::handle_player_input(PlayerInput input) {

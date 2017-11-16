@@ -12,6 +12,11 @@
 
 #include "MatchServer.h"
 
+struct PeerInfo {
+    std::vector<PlayerID> players;
+};
+using PeerInfo = struct PeerInfo;
+
 class Server {
 private:
     std::shared_ptr<std::vector<uint8_t>> update_data;
@@ -20,7 +25,7 @@ private:
     std::shared_ptr<MatchServer> match;
 
 public:
-    Server(uint16_t port);
+    explicit Server(uint16_t port);
     ~Server();
 
     void run(const bool *should_run);

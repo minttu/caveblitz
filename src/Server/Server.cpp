@@ -33,19 +33,23 @@ void Server::run(const bool *should_run) {
     auto start_time = last_time;
     std::chrono::duration<double, std::ratio<1, 120>> tick_duration(1);
     uint32_t ticks = 0;
+    std::vector<PlayerID> joined_players;
 
     while (*should_run) {
         while (enet_host_service(this->server, &event, 0) > 0) {
             switch (event.type) {
             case ENET_EVENT_TYPE_CONNECT:
+                event.peer->data = new PeerInfo{};
                 break;
             case ENET_EVENT_TYPE_DISCONNECT:
+                delete event.peer->data;
+                event.peer->data = nullptr;
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
                 this->update_data->clear();
                 this->input_data->assign(event.packet->data,
                                          event.packet->data + event.packet->dataLength);
-                this->match->handle_input(this->input_data, this->update_data);
+                joined_players = this->match->handle_input(this->input_data, this->update_data);
                 enet_packet_destroy(event.packet);
                 if (!update_data->empty()) {
                     ENetPacket *response_packet = enet_packet_create(this->update_data->data(),
@@ -53,6 +57,15 @@ void Server::run(const bool *should_run) {
                                                                      ENET_PACKET_FLAG_RELIABLE);
                     enet_peer_send(event.peer, 2, response_packet);
                 }
+
+                if (!joined_players.empty()) {
+                    auto peer_info = static_cast<PeerInfo *>(event.peer->data);
+                    for (auto const &player_id : joined_players) {
+                        peer_info->players.push_back(player_id);
+                    }
+                }
+                break;
+            case ENET_EVENT_TYPE_NONE:
                 break;
             default:
                 break;
