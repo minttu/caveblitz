@@ -394,6 +394,10 @@ void MatchServer::update(float dt) {
 
     if (this->game_mode->match_tick(*this)) {
         this->match_status = MATCH_ENDED;
+
+        this->spawned_pickups.clear();
+        this->despawned_pickups.clear();
+        this->explosions.clear();
     }
 }
 
