@@ -7,13 +7,13 @@ build_script:
   - PATH C:\msys64\%MSYSTEM%\bin;C:\msys64\usr\bin;%PATH%
   - bash -lc "pacman --noconfirm --sync --refresh --refresh pacman"
   - bash -lc "pacman --noconfirm --sync --refresh --refresh --sysupgrade --sysupgrade"
-  - bash -xlc "pacman --noconfirm -S --needed base-devel"
-  - bash -xlc "pacman --noconfirm -S --needed mingw-w64-%MSYS2_ARCH%-SDL2 mingw-w64-%MSYS2_ARCH%-SDL2_image mingw-w64-%MSYS2_ARCH%-SDL2_mixer mingw-w64-%MSYS2_ARCH%-SDL2_ttf mingw-w64-%MSYS2_ARCH%-enet mingw-w64-%MSYS2_ARCH%-libpng mingw-w64-%MSYS2_ARCH%-cmake"
+  - bash -lc "pacman --noconfirm -S --needed base-devel"
+  - bash -lc "pacman --noconfirm -S --needed mingw-w64-%MSYS2_ARCH%-SDL2 mingw-w64-%MSYS2_ARCH%-SDL2_image mingw-w64-%MSYS2_ARCH%-SDL2_mixer mingw-w64-%MSYS2_ARCH%-SDL2_ttf mingw-w64-%MSYS2_ARCH%-enet mingw-w64-%MSYS2_ARCH%-libpng mingw-w64-%MSYS2_ARCH%-cmake"
   - cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
   - mkdir build
   - cd build
   - cmake .. -G "MinGW Makefiles" -DCMAKE_SH="CMAKE_SH-NOTFOUND"
-  - make
+  - bash -lc "make"
 
 deploy: off

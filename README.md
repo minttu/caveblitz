@@ -1,8 +1,11 @@
 # caveblitz
 
-[![CircleCI](https://circleci.com/gh/minttu/caveblitz/tree/master.svg?style=svg&circle-token=7eed1db17b9da6e44a085a2de652d81d9d41d50e)](https://circleci.com/gh/minttu/caveblitz/tree/master)
-
 Game where you fly and shoot in a cave.
+
+|   |   |
+| - | - |
+| linux | [![CircleCI](https://circleci.com/gh/minttu/caveblitz/tree/master.svg?style=svg&circle-token=7eed1db17b9da6e44a085a2de652d81d9d41d50e)](https://circleci.com/gh/minttu/caveblitz/tree/master) |
+| windows | [![AppVeyor](https://ci.appveyor.com/api/projects/status/yuahv4fvadkpnh17/branch/master?svg=true)](https://ci.appveyor.com/project/minttu/caveblitz/branch/master)
 
 ## requirements
 
@@ -14,7 +17,7 @@ Game where you fly and shoot in a cave.
 * `SDL2_ttf`
 * `SDL2_mixer`
 * `enet 1.3`
-* `git submodule init; git submodule update`
+* `git submodule update --init --recursive`
 
 ## building
 
