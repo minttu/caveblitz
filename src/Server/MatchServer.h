@@ -30,7 +30,7 @@ private:
     std::shared_ptr<Map> map;
     Image dynamic_image;
     uint8_t match_status;
-    GameMode *game_mode;
+    std::shared_ptr<GameMode> game_mode;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
     std::map<ProjectileID, std::shared_ptr<ServerProjectile>> projectiles;

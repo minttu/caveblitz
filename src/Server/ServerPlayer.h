@@ -7,6 +7,8 @@
 
 #include "../Common/DataTransfer.h"
 
+const static uint8_t NO_WEAPON = 250;
+
 class ServerPlayer {
 public:
     PlayerID player_id;
@@ -16,12 +18,12 @@ public:
     glm::vec2 speed;
     float rotation;
     bool colliding;
-    float primary_ready;
+    float primary_ready{0};
     bool ready_to_play{false};
     int8_t health{100};
     uint8_t primary_weapon{1};
-    float secondary_ready;
-    uint8_t secondary_weapon;
+    float secondary_ready{0};
+    uint8_t secondary_weapon{NO_WEAPON};
     uint16_t secondary_ammo{0};
 
     explicit ServerPlayer(PlayerID id);

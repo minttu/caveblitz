@@ -8,7 +8,7 @@ static const int MAX_PICKUPS = 64;
 MatchServer::MatchServer() : map(std::make_shared<Map>(Map("abstract"))) {
     this->dynamic_image = this->map->get_dynamic()->image();
     this->match_status = MATCH_WAITING;
-    this->game_mode = new FreeForAllGameMode();
+    this->game_mode = std::make_shared<FreeForAllGameMode>(FreeForAllGameMode());
 }
 
 std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
@@ -263,7 +263,8 @@ void MatchServer::fire_primary(std::shared_ptr<ServerPlayer> &player) {
 }
 
 void MatchServer::fire_secondary(std::shared_ptr<ServerPlayer> &player) {
-    if (player->secondary_ready < 0 || player->secondary_ammo <= 0) {
+    if (player->secondary_ready < 0 || player->secondary_ammo <= 0 ||
+        player->secondary_weapon == NO_WEAPON) {
         return;
     }
 
