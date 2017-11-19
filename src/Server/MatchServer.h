@@ -29,7 +29,6 @@ private:
     PickupID next_pickup_id = 0;
     std::shared_ptr<Map> map;
     Image dynamic_image;
-    uint8_t match_status;
     std::shared_ptr<GameMode> game_mode;
 
     std::map<PlayerID, std::shared_ptr<ServerPlayer>> players;
@@ -85,6 +84,8 @@ private:
     }
 
 public:
+    uint8_t match_status;
+
     MatchServer();
     ~MatchServer() = default;
 
@@ -96,6 +97,8 @@ public:
     void update(float dt);
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const;
     void serialize_reliable(const std::shared_ptr<std::vector<uint8_t>> &target) const;
+
+    void join_player_id(PlayerID player_id, const std::shared_ptr<std::vector<uint8_t>> &output);
 
     std::vector<std::shared_ptr<ServerPlayer>> get_players() const override;
     void set_winner(PlayerID player_id) override;

@@ -86,6 +86,19 @@ MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
     return joined_players;
 }
 
+void MatchServer::join_player_id(PlayerID player_id,
+                                 const std::shared_ptr<std::vector<uint8_t>> &output) {
+    this->next_player_id = player_id;
+    try {
+        auto join_info = this->join_server();
+        join_info->serialize(output);
+    } catch (const JoinError &err) {
+        auto fatal = err.to_client_fatal_error();
+        fatal.print();
+        fatal.serialize(output);
+    }
+}
+
 bool MatchServer::handle_player_input(PlayerInput input) {
     try {
         this->players.at(input.player_id);

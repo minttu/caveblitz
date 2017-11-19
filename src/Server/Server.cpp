@@ -25,6 +25,11 @@ Server::Server(uint16_t port)
     std::cerr << "server listening on 0.0.0.0:" << std::to_string(port) << "\n";
 }
 
+void Server::next_match() {
+    this->match = std::make_shared<MatchServer>(MatchServer());
+    this->match_version++;
+}
+
 void Server::run(const bool *should_run) {
     float dt = 0;
     ENetEvent event{};
@@ -34,18 +39,38 @@ void Server::run(const bool *should_run) {
     std::chrono::duration<double, std::ratio<1, 120>> tick_duration(1);
     uint32_t ticks = 0;
     std::vector<PlayerID> joined_players;
+    MatchReset match_reset;
 
     while (*should_run) {
+        if (match->match_status == MATCH_ENDED) {
+            this->next_match();
+        }
+
         while (enet_host_service(this->server, &event, 0) > 0) {
+            auto peer_info = static_cast<PeerInfo *>(event.peer->data);
             switch (event.type) {
             case ENET_EVENT_TYPE_CONNECT:
-                event.peer->data = new PeerInfo{};
+                event.peer->data = new PeerInfo{this->match_version};
                 break;
             case ENET_EVENT_TYPE_DISCONNECT:
                 delete static_cast<PeerInfo *>(event.peer->data);
                 event.peer->data = nullptr;
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
+                if (peer_info->match_version != this->match_version) {
+                    peer_info->match_version = this->match_version;
+                    this->update_data->clear();
+
+                    match_reset.serialize(this->update_data);
+                    for (auto const &id : peer_info->players) {
+                        this->match->join_player_id(id, this->update_data);
+                    }
+                    ENetPacket *response_packet = enet_packet_create(this->update_data->data(),
+                                                                     this->update_data->size(),
+                                                                     ENET_PACKET_FLAG_RELIABLE);
+                    enet_peer_send(event.peer, 2, response_packet);
+                }
+
                 this->update_data->clear();
                 this->input_data->assign(event.packet->data,
                                          event.packet->data + event.packet->dataLength);
@@ -59,7 +84,6 @@ void Server::run(const bool *should_run) {
                 }
 
                 if (!joined_players.empty()) {
-                    auto peer_info = static_cast<PeerInfo *>(event.peer->data);
                     for (auto const &player_id : joined_players) {
                         peer_info->players.push_back(player_id);
                     }

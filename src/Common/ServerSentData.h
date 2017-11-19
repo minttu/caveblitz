@@ -11,10 +11,11 @@ enum ResponseDataType : uint8_t {
     SERVER_JOIN_INFO = 5,
     CLIENT_FATAL_ERROR = 6,
     PICKUP_SPAWN_UPDATE = 7,
-    PICKUP_DESPAWN_UPDATE = 8
+    PICKUP_DESPAWN_UPDATE = 8,
+    MATCH_RESET = 9
 };
 
-const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33, 1, 6, 1};
+const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33, 1, 6, 1, 1};
 
 enum MATCH_STATUS { MATCH_WAITING = 1, MATCH_PLAYING = 2, MATCH_ENDED = 3 };
 
@@ -261,5 +262,12 @@ struct PickupDespawnUpdate {
 };
 
 using PickupDespawnUpdate = struct PickupDespawnUpdate;
+
+struct MatchReset {
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        target->push_back(static_cast<uint8_t>(MATCH_RESET));
+        target->push_back(static_cast<uint8_t>(MATCH_RESET));
+    }
+};
 
 #endif // CAVEBLITZ_COMMON_SERVER_SENT_DATA_H

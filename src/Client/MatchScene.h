@@ -26,6 +26,7 @@ private:
     int map_height;
     bool should_quit;
     int updates_in_frame{0};
+    bool reset{true};
 
     std::shared_ptr<Game> game;
     std::shared_ptr<ServerConnection> server_connection;

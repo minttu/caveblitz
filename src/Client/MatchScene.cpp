@@ -335,6 +335,9 @@ void MatchScene::handle_update() {
             client_fatal_error.print();
             this->server_connection->disconnect();
             break;
+        case MATCH_RESET:
+            this->reset = true;
+            break;
         default:
             break;
         }
@@ -450,9 +453,14 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
 void MatchScene::handle_server_join_info(ServerJoinInfo sji) {
     this->player_ids.push_back(sji.player_id);
 
-    if (this->player_ids.size() > 1) {
+    if (!reset) {
         return;
     }
+    this->state = MATCH_SCENE_LOADING;
+    reset = false;
+
+    this->pickups.clear();
+    this->projectiles.clear();
 
     std::string map_name(reinterpret_cast<char *>(sji.map_name));
     this->load_map(map_name);

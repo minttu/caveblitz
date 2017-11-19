@@ -14,6 +14,11 @@
 
 struct PeerInfo {
     std::vector<PlayerID> players;
+    int match_version;
+
+    explicit PeerInfo(int match_version) {
+        this->match_version = match_version;
+    }
 };
 using PeerInfo = struct PeerInfo;
 
@@ -23,6 +28,9 @@ private:
     std::shared_ptr<std::vector<uint8_t>> input_data;
     ENetHost *server;
     std::shared_ptr<MatchServer> match;
+    int match_version{0};
+
+    void next_match();
 
 public:
     explicit Server(uint16_t port);
