@@ -288,6 +288,7 @@ void MatchScene::handle_update() {
     ClientFatalError client_fatal_error{};
     PickupSpawnUpdate pickup_spawn_update{};
     PickupDespawnUpdate pickup_despawn_update{};
+    ServerMessage server_message{};
 
     while (offset < target.size()) {
         auto type = target[offset];
@@ -296,7 +297,9 @@ void MatchScene::handle_update() {
         }
 
         auto size = gsl::at(RESPONSE_DATA_SIZES, type) + 1;
-        if (size == 1) {
+        if (type == SERVER_MESSAGE && offset + 1 < target.size()) {
+            size = target[offset + 1] + 1;
+        } else if (size == 1) {
             break;
         }
 
@@ -337,6 +340,10 @@ void MatchScene::handle_update() {
             break;
         case MATCH_RESET:
             this->reset = true;
+            break;
+        case SERVER_MESSAGE:
+            server_message.deserialize(span);
+            std::cerr << "SERVER MESSAGE: " << server_message.message << "\n";
             break;
         default:
             break;

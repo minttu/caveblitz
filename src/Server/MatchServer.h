@@ -6,6 +6,7 @@
 #include <memory>
 #include <random>
 #include <vector>
+#include <sstream>
 
 #include <SDL2/SDL.h>
 #include <gsl/gsl>
@@ -62,6 +63,8 @@ private:
     void create_projectiles(std::vector<std::shared_ptr<ServerProjectile>> projectiles);
 
     void player_death_explosion(std::shared_ptr<ServerPlayer> &player);
+
+    void motd(const std::shared_ptr<std::vector<uint8_t>> &output);
 
     template <typename T>
     T max_x() {

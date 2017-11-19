@@ -41,6 +41,7 @@ void Server::run(const bool *should_run) {
     uint32_t ticks = 0;
     std::vector<PlayerID> joined_players;
     MatchReset match_reset;
+    ServerMessage server_message;
     int connected_peers = 0;
 
     while (*should_run) {
@@ -87,18 +88,18 @@ void Server::run(const bool *should_run) {
                 this->input_data->assign(event.packet->data,
                                          event.packet->data + event.packet->dataLength);
                 joined_players = this->match->handle_input(this->input_data, this->update_data);
+                if (!joined_players.empty()) {
+                    for (auto const &player_id : joined_players) {
+                        peer_info->players.push_back(player_id);
+                    }
+                }
+
                 enet_packet_destroy(event.packet);
                 if (!update_data->empty()) {
                     ENetPacket *response_packet = enet_packet_create(this->update_data->data(),
                                                                      this->update_data->size(),
                                                                      ENET_PACKET_FLAG_RELIABLE);
                     enet_peer_send(event.peer, 2, response_packet);
-                }
-
-                if (!joined_players.empty()) {
-                    for (auto const &player_id : joined_players) {
-                        peer_info->players.push_back(player_id);
-                    }
                 }
                 break;
             case ENET_EVENT_TYPE_NONE:

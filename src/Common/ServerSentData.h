@@ -12,10 +12,11 @@ enum ResponseDataType : uint8_t {
     CLIENT_FATAL_ERROR = 6,
     PICKUP_SPAWN_UPDATE = 7,
     PICKUP_DESPAWN_UPDATE = 8,
-    MATCH_RESET = 9
+    MATCH_RESET = 9,
+    SERVER_MESSAGE = 10
 };
 
-const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33, 1, 6, 1, 1};
+const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33, 1, 6, 1, 1, 0};
 
 enum MATCH_STATUS { MATCH_WAITING = 1, MATCH_PLAYING = 2, MATCH_ENDED = 3 };
 
@@ -269,5 +270,37 @@ struct MatchReset {
         target->push_back(static_cast<uint8_t>(MATCH_RESET));
     }
 };
+
+using MatchReset = struct MatchReset;
+
+struct ServerMessage {
+    std::string message{"INVALID"};
+
+    void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
+        if (message.length() > 254) {
+            return;
+        }
+        target->push_back(static_cast<uint8_t>(SERVER_MESSAGE));
+        target->push_back(static_cast<uint8_t>(message.length() + 1));
+        for (auto const &x : message) {
+            target->push_back(static_cast<uint8_t>(x));
+        }
+        target->push_back(0);
+    }
+
+    void deserialize(const gsl::span<uint8_t> &target) {
+        uint8_t length = target[1];
+        if (target.length() - 1 != length) {
+            std::cerr << "Length mismatch " << target.length()
+                      << " -2 != " << std::to_string(length) << "\n";
+            message = "INVALID";
+            return;
+        }
+
+        message = reinterpret_cast<char *>(target.data() + 2);
+    }
+};
+
+using ServerMessage = struct ServerMessage;
 
 #endif // CAVEBLITZ_COMMON_SERVER_SENT_DATA_H

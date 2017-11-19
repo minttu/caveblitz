@@ -4,7 +4,7 @@ FreeForAllGameMode::FreeForAllGameMode() {
 }
 
 std::string FreeForAllGameMode::get_name() {
-    return "Free for all deathmatch";
+    return "deathmatch";
 }
 
 void FreeForAllGameMode::match_start(Match & /*unused*/) {

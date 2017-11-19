@@ -69,6 +69,7 @@ MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
                 auto join_info = this->join_server();
                 join_info->serialize(output);
                 joined_players.push_back(join_info->player_id);
+                this->motd(output);
             } catch (const JoinError &err) {
                 auto fatal = err.to_client_fatal_error();
                 fatal.print();
@@ -86,12 +87,26 @@ MatchServer::handle_input(const std::shared_ptr<std::vector<uint8_t>> &input,
     return joined_players;
 }
 
+void MatchServer::motd(const std::shared_ptr<std::vector<uint8_t>> &output) {
+    ServerMessage server_message;
+    std::stringstream ss;
+    ss << "Welcome to caveblitz! ";
+    ss << "Playing on map: '";
+    ss << this->map->name;
+    ss << "' with game mode: '";
+    ss << this->game_mode->get_name();
+    ss << "'";
+    server_message.message = ss.str();
+    server_message.serialize(output);
+}
+
 void MatchServer::join_player_id(PlayerID player_id,
                                  const std::shared_ptr<std::vector<uint8_t>> &output) {
     this->next_player_id = player_id;
     try {
         auto join_info = this->join_server();
         join_info->serialize(output);
+        this->motd(output);
     } catch (const JoinError &err) {
         auto fatal = err.to_client_fatal_error();
         fatal.print();
