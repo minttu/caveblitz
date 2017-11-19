@@ -8,7 +8,7 @@ class GameMode {
 public:
     virtual std::string get_name() = 0;
     virtual void match_start(Match &match) = 0;
-    virtual bool match_tick(Match &match) = 0;
+    virtual void match_tick(Match &match) = 0;
 };
 
 #endif // CAVEBLITZ_SERVER_GAME_MODE_H

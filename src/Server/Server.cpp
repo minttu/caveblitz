@@ -42,7 +42,7 @@ void Server::run(const bool *should_run) {
                 event.peer->data = new PeerInfo{};
                 break;
             case ENET_EVENT_TYPE_DISCONNECT:
-                delete event.peer->data;
+                delete static_cast<PeerInfo *>(event.peer->data);
                 event.peer->data = nullptr;
                 break;
             case ENET_EVENT_TYPE_RECEIVE:

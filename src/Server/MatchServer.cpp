@@ -397,13 +397,23 @@ void MatchServer::update(float dt) {
         this->pickups.erase(x);
     }
 
-    if (this->game_mode->match_tick(*this)) {
-        this->match_status = MATCH_ENDED;
+    this->game_mode->match_tick(*this);
+}
 
-        this->spawned_pickups.clear();
-        this->despawned_pickups.clear();
-        this->explosions.clear();
+void MatchServer::set_winner(PlayerID player_id) {
+    this->set_draw();
+
+    if (this->players.find(player_id) != this->players.end()) {
+        this->players[player_id]->winner = true;
     }
+}
+
+void MatchServer::set_draw() {
+    this->match_status = MATCH_ENDED;
+
+    this->spawned_pickups.clear();
+    this->despawned_pickups.clear();
+    this->explosions.clear();
 }
 
 void MatchServer::serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {

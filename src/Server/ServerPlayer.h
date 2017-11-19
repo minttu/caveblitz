@@ -25,6 +25,7 @@ public:
     float secondary_ready{0};
     uint8_t secondary_weapon{NO_WEAPON};
     uint16_t secondary_ammo{0};
+    bool winner{false};
 
     explicit ServerPlayer(PlayerID id);
 

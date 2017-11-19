@@ -11,7 +11,7 @@ public:
 
     void match_start(Match &match) override;
 
-    bool match_tick(Match &match) override;
+    void match_tick(Match &match) override;
 };
 
 #endif // CAVEBLITZ_SERVER_FREE_FOR_ALL_GAME_MODE_H

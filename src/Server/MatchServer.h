@@ -98,6 +98,8 @@ public:
     void serialize_reliable(const std::shared_ptr<std::vector<uint8_t>> &target) const;
 
     std::vector<std::shared_ptr<ServerPlayer>> get_players() const override;
+    void set_winner(PlayerID player_id) override;
+    void set_draw() override;
 };
 
 #endif // CAVEBLITZ_SERVER_MATCH_SERVER_H
