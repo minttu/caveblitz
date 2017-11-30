@@ -1,12 +1,13 @@
 #ifndef CAVEBLITZ_SERVER_MATCH_SERVER_H
 #define CAVEBLITZ_SERVER_MATCH_SERVER_H
 
+#include <ctime>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <random>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <gsl/gsl>
@@ -39,6 +40,8 @@ private:
     std::vector<PickupID> spawned_pickups;
     std::vector<PickupID> despawned_pickups;
     std::map<PlayerID, PlayerInput> player_inputs;
+
+    std::mt19937 rng;
 
     bool handle_player_input(PlayerInput input);
 

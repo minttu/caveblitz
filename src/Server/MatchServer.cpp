@@ -1,6 +1,5 @@
 #include "MatchServer.h"
 #include "FreeForAllGameMode.h"
-#include "GameMode.h"
 
 static const int MAX_PLAYERS = 8;
 static const int MAX_PICKUPS = 64;
@@ -9,6 +8,7 @@ MatchServer::MatchServer() : map(std::make_shared<Map>(Map("abstract"))) {
     this->dynamic_image = this->map->get_dynamic()->image();
     this->match_status = MATCH_WAITING;
     this->game_mode = std::make_shared<FreeForAllGameMode>(FreeForAllGameMode());
+    this->rng.seed(static_cast<uint32_t>(time(nullptr)));
 }
 
 std::shared_ptr<ServerJoinInfo> MatchServer::join_server() {
@@ -187,9 +187,8 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
         y += per_step.y;
 
         auto over_map = x <= 0 || x >= max_x || y <= 0 || y >= max_y;
-        auto collision = over_map ||
-                         this->dynamic_image.at(static_cast<uint16_t>(round(x)),
-                                                static_cast<uint16_t>(round(y)))[3] > 0;
+        auto collision = over_map || this->dynamic_image.at(static_cast<uint16_t>(round(x)),
+                                                            static_cast<uint16_t>(round(y)))[3] > 0;
 
         if (collision) {
             this->explode_projectile(prj, x, y);
@@ -343,22 +342,21 @@ void MatchServer::spawn_pickup() {
         id++;
     }
 
-    std::mt19937 mersenne(std::random_device{}());
     std::uniform_int_distribution<uint16_t> x_dist(1, this->max_x<uint16_t>());
     std::uniform_int_distribution<uint16_t> y_dist(1, this->max_x<uint16_t>());
     // TODO: make powerful weapons rarer
     std::uniform_int_distribution<uint8_t> weapon_dist(0,
                                                        (sizeof(WEAPONS) / sizeof(WEAPONS[0])) - 1);
 
-    uint16_t x = x_dist(mersenne);
-    uint16_t y = y_dist(mersenne);
+    uint16_t x = x_dist(this->rng);
+    uint16_t y = y_dist(this->rng);
 
     while (this->dynamic_image.at(x, y)[3] != 0) {
-        x = x_dist(mersenne);
-        y = y_dist(mersenne);
+        x = x_dist(this->rng);
+        y = y_dist(this->rng);
     }
 
-    auto pickup = std::make_shared<ServerPickup>(ServerPickup(id, weapon_dist(mersenne), x, y));
+    auto pickup = std::make_shared<ServerPickup>(ServerPickup(id, weapon_dist(this->rng), x, y));
     this->pickups[id] = pickup;
     this->spawned_pickups.push_back(id);
 }
