@@ -15,5 +15,11 @@ build_script:
   - cd build
   - cmake -G Ninja ..
   - ninja
+  - cpack
 
 deploy: off
+
+artifacts:
+  - path: build\caveblitz*.zip
+    name: caveblitz distribution
+    type: zip
