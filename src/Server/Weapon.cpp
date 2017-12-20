@@ -33,7 +33,7 @@ morning_star_on_hit(std::shared_ptr<ServerProjectile> &prj, std::shared_ptr<Serv
         auto projectile = std::make_shared<ServerProjectile>(
                 ServerProjectile(player->player_id,
                                  0,
-                                 1,
+                                 PELLET_2_PROJECTILE,
                                  prj->position,
                                  glm::rotate(glm::vec2(0.0f, -200.0f), rotation_rad)));
         ret.push_back(projectile);
@@ -43,8 +43,17 @@ morning_star_on_hit(std::shared_ptr<ServerProjectile> &prj, std::shared_ptr<Serv
 
 std::vector<std::shared_ptr<ServerProjectile>>
 fire_morning_star(std::shared_ptr<ServerPlayer> &player) {
-    auto projectile = create_projectile(4, 200.0f, player);
+    auto projectile = create_projectile(MORNING_STAR_PROJECTILE, 200.0f, player);
     projectile->on_hit = morning_star_on_hit;
+
+    std::vector<std::shared_ptr<ServerProjectile>> ret;
+    ret.push_back(projectile);
+    return ret;
+}
+
+std::vector<std::shared_ptr<ServerProjectile>> fire_bomb(std::shared_ptr<ServerPlayer> &player) {
+    auto projectile = create_projectile(BOMB_PROJECTILE, 0, player);
+    projectile->velocity += glm::vec2(0.0f, 50.0f);
 
     std::vector<std::shared_ptr<ServerProjectile>> ret;
     ret.push_back(projectile);

@@ -19,6 +19,8 @@ morning_star_on_hit(std::shared_ptr<ServerProjectile> &prj, std::shared_ptr<Serv
 std::vector<std::shared_ptr<ServerProjectile>>
 fire_morning_star(std::shared_ptr<ServerPlayer> &player);
 
+std::vector<std::shared_ptr<ServerProjectile>> fire_bomb(std::shared_ptr<ServerPlayer> &player);
+
 static const uint16_t PRIMARY_WEAPON = 0;
 
 struct Weapon {
@@ -64,6 +66,7 @@ const static Weapon WEAPONS[] = {Weapon(PRIMARY_WEAPON,
                                         [](std::shared_ptr<ServerPlayer> &plr) {
                                             return fire_primary_weapon(4, 160.0f, plr);
                                         }),
-                                 Weapon(100, 1.0f, fire_morning_star)};
+                                 Weapon(100, 1.0f, fire_morning_star),
+                                 Weapon(100, 1.0f, fire_bomb)};
 
 #endif // CAVEBLITZ_SERVER_WEAPON_H
