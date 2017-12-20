@@ -40,6 +40,7 @@ private:
     std::vector<PickupID> spawned_pickups;
     std::vector<PickupID> despawned_pickups;
     std::map<PlayerID, PlayerInput> player_inputs;
+    std::vector<std::string> messages;
 
     std::mt19937 rng;
 
@@ -68,6 +69,8 @@ private:
     void player_death_explosion(std::shared_ptr<ServerPlayer> &player);
 
     void motd(const std::shared_ptr<std::vector<uint8_t>> &output);
+
+    void frag_message(PlayerID fragger, PlayerID fragged);
 
     template <typename T>
     T max_x() {

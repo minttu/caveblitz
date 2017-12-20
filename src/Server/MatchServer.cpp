@@ -100,6 +100,16 @@ void MatchServer::motd(const std::shared_ptr<std::vector<uint8_t>> &output) {
     server_message.serialize(output);
 }
 
+void MatchServer::frag_message(PlayerID fragger, PlayerID fragged) {
+    std::stringstream ss;
+    ss << "'";
+    ss << std::to_string(fragger);
+    ss << "' fragged '";
+    ss << std::to_string(fragged);
+    ss << "'";
+    this->messages.push_back(ss.str());
+}
+
 void MatchServer::join_player_id(PlayerID player_id,
                                  const std::shared_ptr<std::vector<uint8_t>> &output) {
     this->next_player_id = player_id;
@@ -246,6 +256,7 @@ void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, flo
         if (dist < 12 + (explosion->explosion_size / 2)) {
             player->take_damage(prj->get_damage());
             if (player->health == 0) {
+                this->frag_message(prj->player_id, player->player_id);
                 this->player_death_explosion(player);
             }
         }
@@ -325,6 +336,7 @@ void MatchServer::check_start() {
 
     this->match_status = MATCH_PLAYING;
 
+    this->messages.emplace_back("Starting match");
     this->game_mode->match_start(*this);
 
     for (int i = 0; i < 10; i++) {
@@ -373,6 +385,7 @@ void MatchServer::update(float dt) {
 
     this->spawned_pickups.clear();
     this->despawned_pickups.clear();
+    this->messages.clear();
 
     for (auto const &it : this->players) {
         auto id = it.first;
@@ -440,6 +453,7 @@ void MatchServer::set_draw() {
     this->spawned_pickups.clear();
     this->despawned_pickups.clear();
     this->explosions.clear();
+    this->messages.emplace_back("Match ended");
 }
 
 void MatchServer::serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
@@ -476,6 +490,7 @@ void MatchServer::serialize_reliable(const std::shared_ptr<std::vector<uint8_t>>
 
     PickupSpawnUpdate pickup_spawn_update{};
     PickupDespawnUpdate pickup_despawn_update{};
+    ServerMessage server_message{};
 
     for (auto const &id : this->spawned_pickups) {
         auto pickup = this->pickups.at(id);
@@ -489,6 +504,11 @@ void MatchServer::serialize_reliable(const std::shared_ptr<std::vector<uint8_t>>
     for (auto const &id : this->despawned_pickups) {
         pickup_despawn_update.pickup_id = id;
         pickup_despawn_update.serialize(target);
+    }
+
+    for (auto const &str : this->messages) {
+        server_message.message = str;
+        server_message.serialize(target);
     }
 }
 
