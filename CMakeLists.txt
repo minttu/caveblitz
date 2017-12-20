@@ -5,7 +5,6 @@ SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Winit-self -Woverloaded-virtual -Wuninitialized -Wmissing-declarations -pedantic")
 
 IF(WIN32)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
     SET(WIN32_LIBS ws2_32 winmm)
 ELSE()
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
@@ -162,7 +161,20 @@ IF(WIN32)
         ${LIB_COPY_PATH}/libwebp-7.dll
         ${LIB_COPY_PATH}/zlib1.dll
         ${LIB_COPY_PATH}/liblzma-5.dll
-        DESTINATION /
+        ${LIB_COPY_PATH}/libenet-7.dll
+        ${LIB_COPY_PATH}/SDL2_ttf.dll
+        ${LIB_COPY_PATH}/libfreetype-6.dll
+        ${LIB_COPY_PATH}/libharfbuzz-0.dll
+        ${LIB_COPY_PATH}/libbz2-1.dll
+        ${LIB_COPY_PATH}/libgcc_s_seh-1.dll
+        ${LIB_COPY_PATH}/libglib-2.0-0.dll
+        ${LIB_COPY_PATH}/libgraphite2.dll
+        ${LIB_COPY_PATH}/libintl-8.dll
+        ${LIB_COPY_PATH}/libpcre-1.dll
+        ${LIB_COPY_PATH}/libiconv-2.dll
+        ${LIB_COPY_PATH}/libstdc++-6.dll
+        ${LIB_COPY_PATH}/libwinpthread-1.dll
+        DESTINATION ${INSTALL_TARGET}
     )
 
     SET(CPACK_GENERATOR ZIP)
