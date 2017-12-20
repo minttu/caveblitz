@@ -1,11 +1,9 @@
 # caveblitz
 
-Game where you fly and shoot in a cave.
+[![AppVeyor](https://img.shields.io/circleci/project/github/minttu/caveblitz/master.svg?style=flat&label=linux%20build)](https://ci.appveyor.com/project/minttu/caveblitz/branch/master)
+[![CircleCI](https://img.shields.io/appveyor/ci/minttu/caveblitz.svg?style=flat&label=windows%20build)](https://circleci.com/gh/minttu/caveblitz/tree/master)
 
-|   |   |
-| - | - |
-| linux | [![CircleCI](https://circleci.com/gh/minttu/caveblitz/tree/master.svg?style=svg&circle-token=7eed1db17b9da6e44a085a2de652d81d9d41d50e)](https://circleci.com/gh/minttu/caveblitz/tree/master) |
-| windows | [![AppVeyor](https://ci.appveyor.com/api/projects/status/yuahv4fvadkpnh17/branch/master?svg=true)](https://ci.appveyor.com/project/minttu/caveblitz/branch/master)
+Game where you fly and shoot in a cave.
 
 ## requirements
 
