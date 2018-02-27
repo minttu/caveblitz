@@ -16,6 +16,8 @@ fire_primary_weapon(uint8_t projectile_type, float velocity, std::shared_ptr<Ser
 std::vector<std::shared_ptr<ServerProjectile>>
 morning_star_on_hit(std::shared_ptr<ServerProjectile> &prj, std::shared_ptr<ServerPlayer> &player);
 
+void morning_star_on_update(ServerProjectile &prj, float dt);
+
 std::vector<std::shared_ptr<ServerProjectile>>
 fire_morning_star(std::shared_ptr<ServerPlayer> &player);
 

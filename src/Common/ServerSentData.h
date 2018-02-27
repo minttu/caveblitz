@@ -16,7 +16,7 @@ enum ResponseDataType : uint8_t {
     SERVER_MESSAGE = 10
 };
 
-const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 12, 12, 33, 1, 6, 1, 1, 0};
+const uint8_t RESPONSE_DATA_SIZES[] = {0, 14, 8, 16, 12, 33, 1, 6, 1, 1, 0};
 
 enum MATCH_STATUS { MATCH_WAITING = 1, MATCH_PLAYING = 2, MATCH_ENDED = 3 };
 
@@ -92,6 +92,7 @@ struct ProjectileUpdate {
     uint8_t projectile_type;
     float x;
     float y;
+    float rotation;
 
     void serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
         target->push_back(static_cast<uint8_t>(PROJECTILE_UPDATE));
@@ -105,6 +106,8 @@ struct ProjectileUpdate {
         data.f = x;
         data.serialize(target);
         data.f = y;
+        data.serialize(target);
+        data.f = rotation;
         data.serialize(target);
     }
 
@@ -120,6 +123,8 @@ struct ProjectileUpdate {
         x = data.f;
         data.deserialize(target, 9);
         y = data.f;
+        data.deserialize(target, 13);
+        rotation = data.f;
 
         return true;
     }

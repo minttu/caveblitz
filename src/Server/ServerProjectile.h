@@ -16,6 +16,7 @@ public:
     glm::vec2 position;
     glm::vec2 previous_position;
     glm::vec2 velocity;
+    float rotation;
 
     ProjectileType projectile_type_struct;
 
@@ -23,6 +24,8 @@ public:
 
     std::vector<std::shared_ptr<ServerProjectile>> (*on_hit)(std::shared_ptr<ServerProjectile> &prj,
                                                              std::shared_ptr<ServerPlayer> &plr);
+
+    void (*on_update)(ServerProjectile &projectile, float dt);
 
     ServerProjectile(PlayerID player_id,
                      ProjectileID projectile_id,

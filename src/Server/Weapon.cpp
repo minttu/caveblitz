@@ -41,10 +41,18 @@ morning_star_on_hit(std::shared_ptr<ServerProjectile> &prj, std::shared_ptr<Serv
     return ret;
 }
 
+void morning_star_on_update(ServerProjectile &prj, float dt) {
+    prj.rotation += dt * 1000;
+    if (prj.rotation > 360) {
+        prj.rotation -= 360;
+    }
+}
+
 std::vector<std::shared_ptr<ServerProjectile>>
 fire_morning_star(std::shared_ptr<ServerPlayer> &player) {
     auto projectile = create_projectile(MORNING_STAR_PROJECTILE, 200.0f, player);
     projectile->on_hit = morning_star_on_hit;
+    projectile->on_update = morning_star_on_update;
 
     std::vector<std::shared_ptr<ServerProjectile>> ret;
     ret.push_back(projectile);

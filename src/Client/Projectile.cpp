@@ -4,6 +4,7 @@ Projectile::Projectile(uint8_t projectile_type)
         : projectile_type(gsl::at(PROJECTILE_TYPES, projectile_type)) {
     this->x = 0.0f;
     this->y = 0.0f;
+    this->rotation = 0.0f;
 }
 
 void Projectile::draw(SDL2pp::Renderer *renderer) const {
@@ -14,5 +15,5 @@ void Projectile::draw(SDL2pp::Renderer *renderer) const {
                               dot_size,
                               dot_size);
 
-    renderer->Copy(*this->texture, dot_src_rect, dot_dst_rect);
+    renderer->Copy(*this->texture, dot_src_rect, dot_dst_rect, this->rotation);
 }

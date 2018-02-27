@@ -197,8 +197,9 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
         y += per_step.y;
 
         auto over_map = x <= 0 || x >= max_x || y <= 0 || y >= max_y;
-        auto collision = over_map || this->dynamic_image.at(static_cast<uint16_t>(round(x)),
-                                                            static_cast<uint16_t>(round(y)))[3] > 0;
+        auto collision = over_map ||
+                         this->dynamic_image.at(static_cast<uint16_t>(round(x)),
+                                                static_cast<uint16_t>(round(y)))[3] > 0;
 
         if (collision) {
             this->explode_projectile(prj, x, y);
@@ -478,6 +479,7 @@ void MatchServer::serialize(const std::shared_ptr<std::vector<uint8_t>> &target)
         projectile_update.projectile_type = projectile->projectile_type;
         projectile_update.x = projectile->position.x;
         projectile_update.y = projectile->position.y;
+        projectile_update.rotation = projectile->rotation;
 
         projectile_update.serialize(target);
     }

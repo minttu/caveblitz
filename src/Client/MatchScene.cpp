@@ -379,6 +379,7 @@ void MatchScene::handle_projectile_update(ProjectileUpdate pu) {
     auto projectile = this->projectiles[pu.projectile_id];
     projectile->x = pu.x;
     projectile->y = pu.y;
+    projectile->rotation = pu.rotation;
 }
 
 void MatchScene::handle_explosion_update(ExplosionUpdate eu) {

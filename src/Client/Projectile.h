@@ -19,6 +19,7 @@ public:
     std::shared_ptr<SDL2pp::Texture> texture;
     float x;
     float y;
+    float rotation;
     ProjectileType projectile_type;
 
     explicit Projectile(uint8_t projectile_type);
