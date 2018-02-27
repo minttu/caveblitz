@@ -8,6 +8,7 @@ Game::Game(SDL2pp::Renderer &renderer)
             std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 12));
     this->menu_font =
             std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 24));
+    this->server_thread = nullptr;
 }
 
 std::shared_ptr<SDL2pp::Texture> Game::load_texture(const char *path) {
@@ -58,4 +59,29 @@ void Game::run() {
 
 float Game::fps() const {
     return this->fps_manager.fps();
+}
+
+void server_runner(const bool *should_run, const uint16_t *port) {
+    Server server(*port);
+    server.run(should_run);
+}
+
+void Game::start_server() {
+    if (this->server_thread != nullptr || !this->should_server_run) {
+        return;
+    }
+
+    this->server_thread =
+            new std::thread(server_runner, &this->should_server_run, &this->connect_port);
+}
+
+void Game::stop_server() {
+    if (this->server_thread == nullptr) {
+        return;
+    }
+
+    this->should_server_run = false;
+    this->server_thread->join();
+    delete this->server_thread;
+    this->server_thread = nullptr;
 }

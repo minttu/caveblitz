@@ -12,19 +12,7 @@
 #include "Client/Game.h"
 #include "Client/MatchScene.h"
 
-#include "Server/Server.h"
-
 #include "main.h"
-#include "Client/MenuScene.h"
-
-void server_runner(const bool *should_run, const uint16_t *port) {
-    if (*should_run == false) {
-        return;
-    }
-
-    Server server(*port);
-    server.run(should_run);
-}
 
 int main(int argc, char **argv) {
     if (enet_initialize() != 0) {
@@ -46,8 +34,6 @@ int main(int argc, char **argv) {
 
     CLI11_PARSE(app, argc, argv);
 
-    std::thread server_thread(server_runner, &run_server, &connect_port);
-
     SDL2pp::SDL sdl(SDL_INIT_VIDEO);
     SDL2pp::SDLTTF ttf;
     SDL2pp::Window window("caveblitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
@@ -61,13 +47,14 @@ int main(int argc, char **argv) {
     Game game(renderer);
     game.connect_host = connect_host;
     game.connect_port = connect_port;
+    game.should_server_run = run_server;
+
+    game.start_server();
 
     game.switch_scene(MatchScene::ref);
     game.run();
 
-    run_server = false;
-
-    server_thread.join();
+    game.stop_server();
 
     return 0;
 }

@@ -17,14 +17,18 @@
 #include <SDL2pp/Texture.hh>
 #include <SDL2pp/Window.hh>
 
+#include "../Server/Server.h"
 #include "FPSManager.h"
 #include "Scene.h"
+
+void server_runner(const bool *should_run, const uint16_t *port);
 
 class Game {
 private:
     FPSManager fps_manager;
     std::unordered_map<const char *, std::shared_ptr<SDL2pp::Texture>> textures;
     Scene *scene;
+    std::thread *server_thread;
 
 public:
     SDL2pp::Renderer &renderer;
@@ -34,6 +38,7 @@ public:
 
     std::string connect_host;
     uint16_t connect_port;
+    bool should_server_run;
 
     explicit Game(SDL2pp::Renderer &renderer);
     ~Game() = default;
@@ -49,6 +54,9 @@ public:
     void run();
 
     float fps() const;
+
+    void start_server();
+    void stop_server();
 };
 
 #endif // CAVEBLITZ_GAME_H
