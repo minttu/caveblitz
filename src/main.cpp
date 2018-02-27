@@ -12,8 +12,6 @@
 #include "Client/Game.h"
 #include "Client/MatchScene.h"
 
-#include "main.h"
-
 int main(int argc, char **argv) {
     if (enet_initialize() != 0) {
         std::cerr << "enet_initialize failed\n";
