@@ -3,6 +3,8 @@
 Game::Game(SDL2pp::Renderer &renderer) : renderer(renderer) {
     this->debug_font =
             std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 12));
+    this->menu_font =
+            std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 24));
 }
 
 std::shared_ptr<SDL2pp::Texture> Game::load_texture(const char *path) {

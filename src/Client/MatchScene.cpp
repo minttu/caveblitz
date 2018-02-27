@@ -254,8 +254,8 @@ void MatchScene::draw(DeltaTime dt) {
             auto window_size = this->game->window_size();
             auto press_down_to_start_texture = SDL2pp::Texture(
                     this->game->renderer,
-                    this->game->debug_font->RenderText_Solid("press down to start",
-                                                             SDL2pp::Color{255, 255, 255, 255}));
+                    this->game->menu_font->RenderText_Blended("press down to start",
+                                                              SDL2pp::Color{255, 255, 255, 255}));
             this->game->renderer.Copy(
                     press_down_to_start_texture,
                     SDL2pp::NullOpt,
