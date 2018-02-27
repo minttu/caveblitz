@@ -173,6 +173,10 @@ bool MatchScene::gather_inputs() {
 
     if (this->keys_held[SDLK_DOWN]) {
         input.flags |= PLAYER_INPUT_SECONDARY_USE;
+        if (this->ships.find(this->player_ids[0]) != this->ships.end()) {
+            auto ship = this->ships[this->player_ids[0]];
+            ship->ready_to_play = true;
+        }
     }
 
     input.serialize(this->server_connection->input_data);
@@ -245,6 +249,21 @@ void MatchScene::draw(DeltaTime dt) {
                           size.GetX(),
                           size.GetY());
         this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
+
+        if (!ship->ready_to_play) {
+            auto window_size = this->game->window_size();
+            auto press_down_to_start_texture = SDL2pp::Texture(
+                    this->game->renderer,
+                    this->game->font->RenderText_Solid("press down to start",
+                                                       SDL2pp::Color{255, 255, 255, 255}));
+            this->game->renderer.Copy(
+                    press_down_to_start_texture,
+                    SDL2pp::NullOpt,
+                    SDL2pp::Rect((window_size.GetX() - press_down_to_start_texture.GetWidth()) / 2,
+                                 window_size.GetY() - press_down_to_start_texture.GetHeight(),
+                                 press_down_to_start_texture.GetWidth(),
+                                 press_down_to_start_texture.GetHeight()));
+        }
     } else {
         SDL2pp::Rect view(0, 0, size.GetX(), size.GetY());
         this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
@@ -398,12 +417,12 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
     auto diameter = eu.explosion_size / 2;
     auto diameter_squared = diameter * diameter;
 
-    int min_x = 9999;
-    int min_y = 9999;
+    int min_x = INT32_MAX;
+    int min_y = INT32_MAX;
     int max_x = 0;
     int max_y = 0;
-    int off_x = 9999;
-    int off_y = 9999;
+    int off_x = INT32_MAX;
+    int off_y = INT32_MAX;
 
     std::vector<bool> offs(eu.explosion_size * eu.explosion_size);
     for (int y = 0; y < eu.explosion_size; y++) {
@@ -418,18 +437,18 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
                 offs[offs_offset] = ok;
                 if (ok) {
                     if (xx < min_x) {
-                        min_x = xx;
+                        min_x = static_cast<int>(xx);
                         off_x = x;
                     }
                     if (yy < min_y) {
-                        min_y = yy;
+                        min_y = static_cast<int>(yy);
                         off_y = y;
                     }
                     if (xx > max_x) {
-                        max_x = xx;
+                        max_x = static_cast<int>(xx);
                     }
                     if (yy > max_y) {
-                        max_y = yy;
+                        max_y = static_cast<int>(yy);
                     }
                 }
             } else {
@@ -438,7 +457,7 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
         }
     }
 
-    if (min_x == 9999 && min_y == 9999 && max_x == 0 && max_y == 0) {
+    if (min_x == INT32_MAX && min_y == INT32_MAX && max_x == 0 && max_y == 0) {
         return;
     }
 
@@ -452,7 +471,7 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
         for (int x = 0; x < area.w; x++) {
             if (offs[static_cast<size_t>(x + off_x) +
                      static_cast<size_t>(y + off_y) * eu.explosion_size]) {
-                start[static_cast<int>(x * 4 + (y * pitch)) + 3] = 0;
+                start[x * 4 + (y * pitch) + 3] = 0;
             }
         }
     }

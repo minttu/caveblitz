@@ -30,6 +30,7 @@ public:
     float rotation;
     SDL2pp::Color color;
     int health;
+    bool ready_to_play = false;
 
     explicit Ship(uint8_t player_id);
 
