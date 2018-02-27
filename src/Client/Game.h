@@ -28,7 +28,7 @@ private:
 
 public:
     SDL2pp::Renderer &renderer;
-    std::shared_ptr<SDL2pp::Font> font;
+    std::shared_ptr<SDL2pp::Font> debug_font;
 
     explicit Game(SDL2pp::Renderer &renderer);
     ~Game() = default;

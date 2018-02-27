@@ -254,8 +254,8 @@ void MatchScene::draw(DeltaTime dt) {
             auto window_size = this->game->window_size();
             auto press_down_to_start_texture = SDL2pp::Texture(
                     this->game->renderer,
-                    this->game->font->RenderText_Solid("press down to start",
-                                                       SDL2pp::Color{255, 255, 255, 255}));
+                    this->game->debug_font->RenderText_Solid("press down to start",
+                                                             SDL2pp::Color{255, 255, 255, 255}));
             this->game->renderer.Copy(
                     press_down_to_start_texture,
                     SDL2pp::NullOpt,
@@ -276,19 +276,17 @@ void MatchScene::draw(DeltaTime dt) {
 
 void MatchScene::draw_debug() {
     auto fps_str = "" + std::to_string((int)round(this->game->fps())) + " fps";
-    auto fps_texture =
-            SDL2pp::Texture(this->game->renderer,
-                            this->game->font->RenderText_Solid(fps_str,
-                                                               SDL2pp::Color{255, 255, 255, 255}));
+    auto fps_texture = SDL2pp::Texture(
+            this->game->renderer,
+            this->game->debug_font->RenderText_Solid(fps_str, SDL2pp::Color{255, 255, 255, 255}));
     this->game->renderer.Copy(fps_texture,
                               SDL2pp::NullOpt,
                               SDL2pp::Rect(4, 0, fps_texture.GetWidth(), fps_texture.GetHeight()));
 
     auto upf_str = "" + std::to_string(this->updates_in_frame) + " upf";
-    auto upf_texture =
-            SDL2pp::Texture(this->game->renderer,
-                            this->game->font->RenderText_Solid(upf_str,
-                                                               SDL2pp::Color{255, 255, 255, 255}));
+    auto upf_texture = SDL2pp::Texture(
+            this->game->renderer,
+            this->game->debug_font->RenderText_Solid(upf_str, SDL2pp::Color{255, 255, 255, 255}));
     this->updates_in_frame = 0;
     this->game->renderer.Copy(upf_texture,
                               SDL2pp::NullOpt,

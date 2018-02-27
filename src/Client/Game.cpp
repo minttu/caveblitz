@@ -1,7 +1,7 @@
 #include "Game.h"
 
 Game::Game(SDL2pp::Renderer &renderer) : renderer(renderer) {
-    this->font =
+    this->debug_font =
             std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 12));
 }
 
