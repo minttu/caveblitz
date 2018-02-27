@@ -24,12 +24,16 @@ class Game {
 private:
     FPSManager fps_manager;
     std::unordered_map<const char *, std::shared_ptr<SDL2pp::Texture>> textures;
-    std::shared_ptr<Scene> scene;
+    Scene *scene;
 
 public:
     SDL2pp::Renderer &renderer;
+    SDL2pp::Texture null_texture;
     std::shared_ptr<SDL2pp::Font> debug_font;
     std::shared_ptr<SDL2pp::Font> menu_font;
+
+    std::string connect_host;
+    uint16_t connect_port;
 
     explicit Game(SDL2pp::Renderer &renderer);
     ~Game() = default;
@@ -38,7 +42,7 @@ public:
 
     std::shared_ptr<SDL2pp::Texture> load_texture(const char *path);
 
-    void set_scene(std::shared_ptr<Scene> scene);
+    void switch_scene(Scene *(*new_scene_fn)(Game *));
 
     SDL2pp::Point window_size() const;
 

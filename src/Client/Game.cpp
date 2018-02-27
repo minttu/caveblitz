@@ -1,6 +1,9 @@
 #include "Game.h"
 
-Game::Game(SDL2pp::Renderer &renderer) : renderer(renderer) {
+Game::Game(SDL2pp::Renderer &renderer)
+        : scene(nullptr),
+          renderer(renderer),
+          null_texture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, 2, 2) {
     this->debug_font =
             std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 12));
     this->menu_font =
@@ -19,8 +22,18 @@ std::shared_ptr<SDL2pp::Texture> Game::load_texture(const char *path) {
     return texture;
 }
 
-void Game::set_scene(std::shared_ptr<Scene> scene) {
-    this->scene = std::move(scene);
+void Game::switch_scene(Scene *(*new_scene_fn)(Game *)) {
+    auto new_scene = new_scene_fn(this);
+
+    if (this->scene != nullptr) {
+        this->scene->switched_from();
+    }
+
+    if (new_scene != nullptr) {
+        new_scene->switched_to();
+    }
+
+    this->scene = new_scene;
 }
 
 SDL2pp::Point Game::window_size() const {
@@ -28,6 +41,10 @@ SDL2pp::Point Game::window_size() const {
 }
 
 void Game::run() {
+    if (this->scene == nullptr) {
+        return;
+    }
+
     DeltaTime dt = 0.0f;
 
     while (true) {

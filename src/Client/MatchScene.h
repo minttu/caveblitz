@@ -6,7 +6,6 @@
 
 #include "Explosion.h"
 #include "FPSManager.h"
-#include "Game.h"
 #include "Pickup.h"
 #include "Projectile.h"
 #include "Scene.h"
@@ -28,7 +27,6 @@ private:
     int updates_in_frame{0};
     bool reset{true};
 
-    std::shared_ptr<Game> game;
     std::shared_ptr<ServerConnection> server_connection;
     std::vector<PlayerID> player_ids;
     size_t joins_sent{0};
@@ -52,20 +50,13 @@ private:
 
     void load_background_layer();
 
-    void draw_debug();
-
-public:
-    MatchScene(std::shared_ptr<Game> game, std::shared_ptr<ServerConnection> server_connection);
-
-    bool gather_inputs();
-
-    bool tick(DeltaTime dt) override;
-
-    void join_server();
-
     void draw(DeltaTime dt);
 
     void handle_update();
+
+    void draw_debug();
+
+    void draw_ready_to_play() const;
 
     void handle_player_update(PlayerUpdate pu);
 
@@ -78,6 +69,22 @@ public:
     void handle_pickup_despawn_update(PickupDespawnUpdate pdu);
 
     void handle_server_join_info(ServerJoinInfo sji);
+
+    void join_server();
+
+    bool gather_inputs();
+
+public:
+    explicit MatchScene(Game *game);
+
+    std::string name() const override;
+    bool tick(DeltaTime dt) override;
+    void switched_to() override;
+    void switched_from() override;
+
+    static Scene *ref(Game *game) {
+        return new MatchScene(game);
+    }
 };
 
 #endif // CAVEBLITZ_CLIENT_MATCH_SCENE_H

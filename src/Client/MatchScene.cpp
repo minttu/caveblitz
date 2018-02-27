@@ -1,8 +1,9 @@
 #include "MatchScene.h"
+#include "MenuScene.h"
 
-MatchScene::MatchScene(std::shared_ptr<Game> game,
-                       std::shared_ptr<ServerConnection> server_connection)
-        : map_width(2),
+MatchScene::MatchScene(Game *game)
+        : Scene(game),
+          map_width(2),
           map_height(2),
           should_quit(false),
           dynamic_layer(game->renderer,
@@ -20,9 +21,7 @@ MatchScene::MatchScene(std::shared_ptr<Game> game,
                         SDL_TEXTUREACCESS_TARGET,
                         map_width,
                         map_height) {
-
-    this->server_connection = std::move(server_connection);
-    this->game = std::move(game);
+    this->server_connection = nullptr;
 }
 
 void MatchScene::load_map(const std::string &name) {
@@ -96,6 +95,10 @@ void MatchScene::load_background_layer() {
 }
 
 bool MatchScene::tick(DeltaTime dt) {
+    if (this->server_connection == nullptr) {
+        return true;
+    }
+
     if (this->should_quit || this->server_connection->disconnected) {
         return false;
     }
@@ -251,18 +254,7 @@ void MatchScene::draw(DeltaTime dt) {
         this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
 
         if (!ship->ready_to_play) {
-            auto window_size = this->game->window_size();
-            auto press_down_to_start_texture = SDL2pp::Texture(
-                    this->game->renderer,
-                    this->game->menu_font->RenderText_Blended("press down to start",
-                                                              SDL2pp::Color{255, 255, 255, 255}));
-            this->game->renderer.Copy(
-                    press_down_to_start_texture,
-                    SDL2pp::NullOpt,
-                    SDL2pp::Rect((window_size.GetX() - press_down_to_start_texture.GetWidth()) / 2,
-                                 window_size.GetY() - press_down_to_start_texture.GetHeight(),
-                                 press_down_to_start_texture.GetWidth(),
-                                 press_down_to_start_texture.GetHeight()));
+            this->draw_ready_to_play();
         }
     } else {
         SDL2pp::Rect view(0, 0, size.GetX(), size.GetY());
@@ -272,6 +264,21 @@ void MatchScene::draw(DeltaTime dt) {
     this->draw_debug();
 
     this->game->renderer.Present();
+}
+
+void MatchScene::draw_ready_to_play() const {
+    auto window_size = game->window_size();
+    auto press_down_to_start_texture =
+            SDL2pp::Texture(game->renderer,
+                            game->menu_font->RenderText_Blended("press down to start",
+                                                                SDL2pp::Color{255, 255, 255, 255}));
+    game->renderer.Copy(press_down_to_start_texture,
+                        SDL2pp::NullOpt,
+                        SDL2pp::Rect((window_size.GetX() - press_down_to_start_texture.GetWidth()) /
+                                             2,
+                                     window_size.GetY() - press_down_to_start_texture.GetHeight(),
+                                     press_down_to_start_texture.GetWidth(),
+                                     press_down_to_start_texture.GetHeight()));
 }
 
 void MatchScene::draw_debug() {
@@ -508,4 +515,17 @@ void MatchScene::handle_pickup_despawn_update(PickupDespawnUpdate pdu) {
     if (this->pickups.find(pdu.pickup_id) != this->pickups.end()) {
         this->pickups.erase(pdu.pickup_id);
     }
+}
+
+std::string MatchScene::name() const {
+    return "game";
+}
+
+void MatchScene::switched_to() {
+    this->server_connection = std::make_shared<ServerConnection>(
+            ServerConnection(this->game->connect_host, this->game->connect_port));
+}
+
+void MatchScene::switched_from() {
+    this->server_connection->disconnect();
 }

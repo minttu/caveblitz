@@ -11,11 +11,11 @@
 
 #include "Client/Game.h"
 #include "Client/MatchScene.h"
-#include "Client/ServerConnection.h"
 
 #include "Server/Server.h"
 
 #include "main.h"
+#include "Client/MenuScene.h"
 
 void server_runner(const bool *should_run, const uint16_t *port) {
     if (*should_run == false) {
@@ -58,14 +58,12 @@ int main(int argc, char **argv) {
     SDL2pp::Surface icon("assets/icon.png");
     window.SetIcon(icon);
 
-    auto game = std::make_shared<Game>(Game(renderer));
+    Game game(renderer);
+    game.connect_host = connect_host;
+    game.connect_port = connect_port;
 
-    auto server_connection = std::make_shared<ServerConnection>(ServerConnection(connect_host, connect_port));
-
-    auto scene = std::make_shared<MatchScene>(MatchScene(game, server_connection));
-
-    game->set_scene(scene);
-    game->run();
+    game.switch_scene(MatchScene::ref);
+    game.run();
 
     run_server = false;
 
