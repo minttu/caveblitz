@@ -37,8 +37,6 @@ private:
     SDL2pp::Texture background_layer;
     SDL2pp::Texture render_target;
 
-    std::unordered_map<int32_t, bool> keys_held;
-
     std::map<PlayerID, std::shared_ptr<Ship>> ships;
     std::map<ProjectileID, std::shared_ptr<Projectile>> projectiles;
     std::map<PickupID, std::shared_ptr<Pickup>> pickups;
@@ -72,13 +70,13 @@ private:
 
     void join_server();
 
-    bool gather_inputs();
+    bool gather_inputs(std::vector<Input> vector);
 
 public:
     explicit MatchScene(Game *game);
 
     std::string name() const override;
-    bool tick(DeltaTime dt) override;
+    bool tick(DeltaTime dt, std::vector<Input> inputs) override;
     void switched_to() override;
     void switched_from() override;
 

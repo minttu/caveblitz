@@ -47,9 +47,15 @@ void Game::run() {
     }
 
     DeltaTime dt = 0.0f;
+    std::vector<Input> inputs;
 
     while (true) {
-        if (!this->scene->tick(dt)) {
+        this->input.player_inputs(&inputs);
+        if (this->input.should_quit) {
+            break;
+        }
+
+        if (!this->scene->tick(dt, inputs)) {
             break;
         }
 

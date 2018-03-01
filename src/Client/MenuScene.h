@@ -7,7 +7,7 @@ class MenuScene : public Scene {
 public:
     explicit MenuScene(Game *game);
     std::string name() const override;
-    bool tick(DeltaTime dt) override;
+    bool tick(DeltaTime dt, std::vector<Input> inputs) override;
     void switched_to() override;
     void switched_from() override;
 

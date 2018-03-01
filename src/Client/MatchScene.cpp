@@ -94,7 +94,7 @@ void MatchScene::load_background_layer() {
     this->background_layer.SetBlendMode(SDL_BLENDMODE_BLEND);
 }
 
-bool MatchScene::tick(DeltaTime dt) {
+bool MatchScene::tick(DeltaTime dt, std::vector<Input> inputs) {
     if (this->server_connection == nullptr) {
         return true;
     }
@@ -103,7 +103,7 @@ bool MatchScene::tick(DeltaTime dt) {
         return false;
     }
 
-    if (!this->gather_inputs()) {
+    if (!this->gather_inputs(inputs)) {
         return false;
     }
 
@@ -125,64 +125,34 @@ void MatchScene::join_server() {
     this->joins_sent++;
 }
 
-bool MatchScene::gather_inputs() {
-    SDL_Event e{};
-
-    this->server_connection->input_data->clear();
-
+bool MatchScene::gather_inputs(std::vector<Input> inputs) {
     if (this->player_ids.empty()) {
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                return false;
-            }
-        }
-
         return true;
     }
 
-    PlayerInput input{};
-    input.player_id = this->player_ids[0];
-    input.rotation = 0;
-    input.thrust = 0;
-    input.flags = 0;
+    this->server_connection->input_data->clear();
 
-    while (SDL_PollEvent(&e) != 0) {
-        if (e.type == SDL_QUIT) {
-            return false;
-        }
-        if (e.type == SDL_KEYDOWN) {
-            this->keys_held[e.key.keysym.sym] = true;
-        }
-        if (e.type == SDL_KEYUP) {
-            this->keys_held[e.key.keysym.sym] = false;
-        }
+    Input input = inputs.at(0);
+    PlayerInput playerInput{};
+
+    playerInput.player_id = this->player_ids[0];
+    playerInput.rotation = input.rotation;
+    playerInput.thrust = input.thrust;
+    playerInput.flags = 0;
+
+    if (input.primary) {
+        playerInput.flags |= PLAYER_INPUT_PRIMARY_USE;
     }
 
-    if (this->keys_held[SDLK_UP]) {
-        input.thrust += 127;
-    }
-
-    if (this->keys_held[SDLK_RIGHT]) {
-        input.rotation -= 127;
-    }
-
-    if (this->keys_held[SDLK_LEFT]) {
-        input.rotation += 127;
-    }
-
-    if (this->keys_held[SDLK_RSHIFT]) {
-        input.flags |= PLAYER_INPUT_PRIMARY_USE;
-    }
-
-    if (this->keys_held[SDLK_DOWN]) {
-        input.flags |= PLAYER_INPUT_SECONDARY_USE;
+    if (input.special) {
+        playerInput.flags |= PLAYER_INPUT_SECONDARY_USE;
         if (this->ships.find(this->player_ids[0]) != this->ships.end()) {
             auto ship = this->ships[this->player_ids[0]];
             ship->ready_to_play = true;
         }
     }
 
-    input.serialize(this->server_connection->input_data);
+    playerInput.serialize(this->server_connection->input_data);
 
     return true;
 }

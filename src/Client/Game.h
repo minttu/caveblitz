@@ -19,6 +19,7 @@
 
 #include "../Server/Server.h"
 #include "FPSManager.h"
+#include "InputManager.h"
 #include "Scene.h"
 
 void server_runner(const bool *should_run, const uint16_t *port);
@@ -39,6 +40,8 @@ public:
     std::string connect_host;
     uint16_t connect_port;
     bool should_server_run;
+
+    InputManager input;
 
     explicit Game(SDL2pp::Renderer &renderer);
     ~Game() = default;
