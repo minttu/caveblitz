@@ -54,7 +54,7 @@ private:
 
     void draw_debug();
 
-    void draw_ready_to_play() const;
+    void draw_ready_to_play(SDL2pp::Rect viewport) const;
 
     void handle_player_update(PlayerUpdate pu);
 

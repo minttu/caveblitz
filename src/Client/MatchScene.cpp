@@ -208,27 +208,48 @@ void MatchScene::draw(DeltaTime dt) {
 
     auto size = this->game->window_size();
 
-    if (!this->player_ids.empty() && !this->ships.empty() &&
-        this->ships.find(this->player_ids[0]) != this->ships.end()) {
+    auto scale_x = 1.0f;
+    auto scale_y = 1.0f;
+    auto viewport_height_splits = this->ships.size() > 2 ? 2 : 1;
+    auto viewport_width_splits = this->ships.size() > 1 ? 2 : 1;
+    auto viewport_width = size.GetX() / viewport_width_splits;
+    auto viewport_height = size.GetY() / viewport_height_splits;
+    auto viewport_x = 0;
+    auto viewport_y = 0;
 
-        auto ship = this->ships[this->player_ids[0]];
-        SDL2pp::Rect view(std::round(std::max(std::min(ship->x - size.GetX() / 2,
-                                                       static_cast<float>(map_width) - size.GetX()),
-                                              0.0f)),
-                          std::round(
-                                  std::max(std::min(ship->y - size.GetY() / 2,
-                                                    static_cast<float>(map_height) - size.GetY()),
-                                           0.0f)),
-                          size.GetX(),
-                          size.GetY());
-        this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
-
-        if (!ship->ready_to_play) {
-            this->draw_ready_to_play();
-        }
-    } else {
+    if (this->player_ids.empty() || this->ships.empty()) {
         SDL2pp::Rect view(0, 0, size.GetX(), size.GetY());
         this->game->renderer.Copy(this->render_target, view, SDL2pp::NullOpt);
+    } else {
+        for (const auto &x : this->ships) {
+            auto ship = x.second;
+
+            SDL2pp::Rect view(std::round(std::max(std::min(ship->x - viewport_width / (2 * scale_x),
+                                                           static_cast<float>(map_width) -
+                                                                   viewport_width / scale_x),
+                                                  0.0f)),
+                              std::round(
+                                      std::max(std::min(ship->y - viewport_height / (2 * scale_y),
+                                                        static_cast<float>(map_height) -
+                                                                viewport_height / scale_y),
+                                               0.0f)),
+                              viewport_width / scale_x,
+                              viewport_height / scale_y);
+
+            SDL2pp::Rect viewport(viewport_x, viewport_y, viewport_width, viewport_height);
+            this->game->renderer.Copy(this->render_target, view, viewport);
+
+            if (!ship->ready_to_play) {
+                this->draw_ready_to_play(viewport);
+            }
+
+            if (viewport_x == 0) {
+                viewport_x += viewport_width;
+            } else if (viewport_y == 0) {
+                viewport_y += viewport_height;
+                viewport_x = 0;
+            }
+        }
     }
 
     this->draw_debug();
@@ -236,19 +257,20 @@ void MatchScene::draw(DeltaTime dt) {
     this->game->renderer.Present();
 }
 
-void MatchScene::draw_ready_to_play() const {
-    auto window_size = game->window_size();
+void MatchScene::draw_ready_to_play(SDL2pp::Rect viewport) const {
     auto press_down_to_start_texture =
             SDL2pp::Texture(game->renderer,
                             game->menu_font->RenderText_Blended("press down to start",
                                                                 SDL2pp::Color{255, 255, 255, 255}));
-    game->renderer.Copy(press_down_to_start_texture,
-                        SDL2pp::NullOpt,
-                        SDL2pp::Rect((window_size.GetX() - press_down_to_start_texture.GetWidth()) /
-                                             2,
-                                     window_size.GetY() - press_down_to_start_texture.GetHeight(),
-                                     press_down_to_start_texture.GetWidth(),
-                                     press_down_to_start_texture.GetHeight()));
+    game->renderer.Copy(
+            press_down_to_start_texture,
+            SDL2pp::NullOpt,
+            SDL2pp::Rect(viewport.GetX() +
+                                 ((viewport.GetW() - press_down_to_start_texture.GetWidth()) / 2),
+                         viewport.GetY() +
+                                 (viewport.GetH() - press_down_to_start_texture.GetHeight()),
+                         press_down_to_start_texture.GetWidth(),
+                         press_down_to_start_texture.GetHeight()));
 }
 
 void MatchScene::draw_debug() {
