@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 
     SDL2pp::SDL sdl(SDL_INIT_VIDEO);
     SDL2pp::SDLTTF ttf;
-    SDL2pp::Window window("caveblitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
+    SDL2pp::Window window("caveblitz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080, SDL_WINDOW_SHOWN);
     SDL2pp::Renderer renderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");

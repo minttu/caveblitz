@@ -24,7 +24,8 @@ class InputManager {
 private:
     std::unordered_map<int32_t, bool> keys_held;
 
-    Input keyboard_input();
+    Input keyboard_arrow_input();
+    Input keyboard_wasd_input();
 
 public:
     InputManager();

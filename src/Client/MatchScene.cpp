@@ -111,6 +111,7 @@ bool MatchScene::tick(DeltaTime dt, std::vector<Input> inputs) {
 
     if (this->server_connection->connected && this->joins_sent == 0) {
         this->join_server();
+        this->join_server();
     }
 
     this->handle_update();
@@ -132,27 +133,35 @@ bool MatchScene::gather_inputs(std::vector<Input> inputs) {
 
     this->server_connection->input_data->clear();
 
-    Input input = inputs.at(0);
-    PlayerInput playerInput{};
+    unsigned input_num = 0;
+    for (const auto &x : this->ships) {
+        auto ship = x.second;
 
-    playerInput.player_id = this->player_ids[0];
-    playerInput.rotation = input.rotation;
-    playerInput.thrust = input.thrust;
-    playerInput.flags = 0;
+        if (input_num >= inputs.size()) {
+            break;
+        }
 
-    if (input.primary) {
-        playerInput.flags |= PLAYER_INPUT_PRIMARY_USE;
-    }
+        Input input = inputs.at(input_num);
+        PlayerInput playerInput{};
 
-    if (input.special) {
-        playerInput.flags |= PLAYER_INPUT_SECONDARY_USE;
-        if (this->ships.find(this->player_ids[0]) != this->ships.end()) {
-            auto ship = this->ships[this->player_ids[0]];
+        playerInput.player_id = ship->player_id;
+        playerInput.rotation = input.rotation;
+        playerInput.thrust = input.thrust;
+        playerInput.flags = 0;
+
+        if (input.primary) {
+            playerInput.flags |= PLAYER_INPUT_PRIMARY_USE;
+        }
+
+        if (input.special) {
+            playerInput.flags |= PLAYER_INPUT_SECONDARY_USE;
             ship->ready_to_play = true;
         }
-    }
 
-    playerInput.serialize(this->server_connection->input_data);
+        playerInput.serialize(this->server_connection->input_data);
+
+        input_num++;
+    }
 
     return true;
 }
@@ -204,18 +213,21 @@ void MatchScene::draw(DeltaTime dt) {
     }
 
     this->game->renderer.SetTarget();
+    this->game->renderer.SetDrawColor(52, 52, 52, 255);
     this->game->renderer.Clear();
 
     auto size = this->game->window_size();
 
-    auto scale_x = 1.0f;
-    auto scale_y = 1.0f;
+    auto scale_x = 2.0f;
+    auto scale_y = 2.0f;
     auto viewport_height_splits = this->ships.size() > 2 ? 2 : 1;
     auto viewport_width_splits = this->ships.size() > 1 ? 2 : 1;
-    auto viewport_width = size.GetX() / viewport_width_splits;
-    auto viewport_height = size.GetY() / viewport_height_splits;
+    auto viewport_width = std::min(675, size.GetX() / viewport_width_splits);
+    auto viewport_height = std::min(540, size.GetY() / viewport_height_splits);
     auto viewport_x = 0;
     auto viewport_y = 0;
+    auto x_offset = (size.GetX() - (viewport_width_splits * viewport_width)) / 2;
+    auto y_offset = (size.GetY() - (viewport_height_splits * viewport_height)) / 2;
 
     if (this->player_ids.empty() || this->ships.empty()) {
         SDL2pp::Rect view(0, 0, size.GetX(), size.GetY());
@@ -224,19 +236,23 @@ void MatchScene::draw(DeltaTime dt) {
         for (const auto &x : this->ships) {
             auto ship = x.second;
 
-            SDL2pp::Rect view(std::round(std::max(std::min(ship->x - viewport_width / (2 * scale_x),
+            SDL2pp::Rect view(std::round(std::max(std::min(std::round(ship->x) -
+                                                                   viewport_width / (2 * scale_x),
                                                            static_cast<float>(map_width) -
                                                                    viewport_width / scale_x),
                                                   0.0f)),
-                              std::round(
-                                      std::max(std::min(ship->y - viewport_height / (2 * scale_y),
-                                                        static_cast<float>(map_height) -
-                                                                viewport_height / scale_y),
-                                               0.0f)),
-                              viewport_width / scale_x,
-                              viewport_height / scale_y);
+                              std::round(std::max(std::min(std::round(ship->y) -
+                                                                   viewport_height / (2 * scale_y),
+                                                           static_cast<float>(map_height) -
+                                                                   viewport_height / scale_y),
+                                                  0.0f)),
+                              (viewport_width - 2) / scale_x,
+                              (viewport_height - 2) / scale_y);
 
-            SDL2pp::Rect viewport(viewport_x, viewport_y, viewport_width, viewport_height);
+            SDL2pp::Rect viewport(x_offset + viewport_x + 1,
+                                  y_offset + viewport_y + 1,
+                                  viewport_width - 2,
+                                  viewport_height - 2);
             this->game->renderer.Copy(this->render_target, view, viewport);
 
             if (!ship->ready_to_play) {

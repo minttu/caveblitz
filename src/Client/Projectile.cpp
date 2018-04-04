@@ -8,12 +8,12 @@ Projectile::Projectile(uint8_t projectile_type)
 }
 
 void Projectile::draw(SDL2pp::Renderer *renderer) const {
-    SDL2pp::Rect dot_src_rect = this->projectile_type.texture_bounds;
-    const int dot_size = dot_src_rect.GetW();
-    SDL2pp::Rect dot_dst_rect(static_cast<int>(roundf(this->x) - (dot_size - 2) / 2),
-                              static_cast<int>(roundf(this->y) - (dot_size - 2) / 2),
-                              dot_size,
-                              dot_size);
+    SDL2pp::Rect src_rect = this->projectile_type.texture_bounds;
+    const int projectile_size = src_rect.GetW();
+    SDL2pp::Rect destination_rect(static_cast<int>(roundf(this->x) - projectile_size / 2.0f),
+                                  static_cast<int>(roundf(this->y) - projectile_size / 2.0f),
+                                  projectile_size,
+                                  projectile_size);
 
-    renderer->Copy(*this->texture, dot_src_rect, dot_dst_rect, this->rotation);
+    renderer->Copy(*this->texture, src_rect, destination_rect, this->rotation);
 }
