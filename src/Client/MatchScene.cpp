@@ -109,8 +109,7 @@ bool MatchScene::tick(DeltaTime dt, std::vector<Input> inputs) {
 
     this->server_connection->tick();
 
-    if (this->server_connection->connected && this->joins_sent == 0) {
-        this->join_server();
+    while (this->server_connection->connected && this->joins_sent < inputs.size()) {
         this->join_server();
     }
 
@@ -536,4 +535,5 @@ void MatchScene::switched_to() {
 
 void MatchScene::switched_from() {
     this->server_connection->disconnect();
+    this->joins_sent = 0;
 }

@@ -197,8 +197,9 @@ bool MatchServer::check_projectile_collisions(std::shared_ptr<ServerProjectile> 
         y += per_step.y;
 
         auto over_map = x <= 0 || x >= max_x || y <= 0 || y >= max_y;
-        auto collision = over_map || this->dynamic_image.at(static_cast<uint16_t>(round(x)),
-                                                            static_cast<uint16_t>(round(y)))[3] > 0;
+        auto collision = over_map ||
+                         this->dynamic_image.at(static_cast<uint16_t>(round(x)),
+                                                static_cast<uint16_t>(round(y)))[3] > 0;
 
         if (collision) {
             this->explode_projectile(prj, x, y);
