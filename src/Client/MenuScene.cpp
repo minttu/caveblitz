@@ -3,7 +3,7 @@
 MenuScene::MenuScene(Game *game) : Scene(game) {
 }
 
-bool MenuScene::tick(DeltaTime dt, std::vector<Input> inputs) {
+bool MenuScene::tick(DeltaTime /*unused*/, std::vector<Input> /*unused*/) {
     return true;
 }
 

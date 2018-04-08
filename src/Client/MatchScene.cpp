@@ -324,15 +324,15 @@ void MatchScene::draw_messages(DeltaTime dt) {
     auto pos = game->window_size().GetY() - 24;
     for (auto it = this->messages.rbegin(); it != this->messages.rend(); ++it) {
         int x = 4;
-        int offset = 0;
-        int size = static_cast<int>(it->size());
-        char chars[it->size()];
+        size_t offset = 0;
+        size_t size = it->size();
+        auto *chars = new char[it->size()];
         strcpy(chars, it->c_str());
         SDL2pp::Color color{255, 255, 255, 255};
         SDL2pp::Color next_color{255, 255, 255, 255};
 
         while (offset < it->size()) {
-            for (int i = offset; i < it->size(); i++, size = i - offset) {
+            for (size_t i = offset; i < it->size() - 1; i++, size = i - offset) {
                 if (chars[i] == '^') {
                     if (chars[i + 1] == 'r') {
                         next_color = SDL2pp::Color{255, 255, 255, 255};
@@ -363,6 +363,8 @@ void MatchScene::draw_messages(DeltaTime dt) {
             offset += size + 2;
             color = next_color;
         }
+
+        delete chars;
 
         pos -= 24;
         max_messages--;

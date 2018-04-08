@@ -28,15 +28,15 @@ void FreeForAllGameMode::match_tick(Match &match, float dt) {
 
     if (this->time_remaining < 5.0f && !this->remaining[0]) {
         this->remaining[0] = true;
-        std::string remaining = "5 sec remaining";
+        std::string remaining = "^65^r sec remaining";
         match.send_message(remaining);
     } else if (this->time_remaining < 15.0f && !this->remaining[1]) {
         this->remaining[1] = true;
-        std::string remaining = "15 sec remaining";
+        std::string remaining = "^615^r sec remaining";
         match.send_message(remaining);
     } else if (this->time_remaining < 30.0f && !this->remaining[2]) {
         this->remaining[2] = true;
-        std::string remaining = "30 sec remaining";
+        std::string remaining = "^630^r sec remaining";
         match.send_message(remaining);
     }
 
