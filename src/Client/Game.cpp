@@ -8,6 +8,8 @@ Game::Game(SDL2pp::Renderer &renderer)
             std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 12));
     this->menu_font =
             std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 24));
+    this->chat_font =
+            std::make_shared<SDL2pp::Font>(SDL2pp::Font("assets/fonts/WorkSans-Regular.ttf", 18));
     this->server_thread = nullptr;
 }
 

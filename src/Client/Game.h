@@ -36,6 +36,7 @@ public:
     SDL2pp::Texture null_texture;
     std::shared_ptr<SDL2pp::Font> debug_font;
     std::shared_ptr<SDL2pp::Font> menu_font;
+    std::shared_ptr<SDL2pp::Font> chat_font;
 
     std::string connect_host;
     uint16_t connect_port;

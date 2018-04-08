@@ -19,6 +19,8 @@
 
 enum MatchSceneState { MATCH_SCENE_LOADING = 1, MATCH_SCENE_PLAYING = 2 };
 
+const static float MESSAGE_SHOW_TIME = 10.0f;
+
 class MatchScene : public Scene {
 private:
     int map_width;
@@ -41,6 +43,8 @@ private:
     std::map<ProjectileID, std::shared_ptr<Projectile>> projectiles;
     std::map<PickupID, std::shared_ptr<Pickup>> pickups;
     std::vector<std::shared_ptr<Explosion>> explosions;
+    std::vector<std::string> messages;
+    float show_messages_timer = 0.0f;
 
     void load_map(const std::string &name);
 
@@ -55,6 +59,8 @@ private:
     void draw_debug();
 
     void draw_ready_to_play(SDL2pp::Rect viewport) const;
+
+    void draw_messages(DeltaTime dt);
 
     void handle_player_update(PlayerUpdate pu);
 

@@ -267,6 +267,8 @@ void MatchScene::draw(DeltaTime dt) {
         }
     }
 
+    this->draw_messages(dt);
+
     this->draw_debug();
 
     this->game->renderer.Present();
@@ -305,6 +307,37 @@ void MatchScene::draw_debug() {
     this->game->renderer.Copy(upf_texture,
                               SDL2pp::NullOpt,
                               SDL2pp::Rect(54, 0, upf_texture.GetWidth(), upf_texture.GetHeight()));
+}
+
+void MatchScene::draw_messages(DeltaTime dt) {
+    if (this->show_messages_timer <= 0.0f) {
+        return;
+    }
+
+    this->show_messages_timer -= dt;
+
+    uint8_t alpha = static_cast<uint8_t>(this->show_messages_timer < 1.0f
+                                                 ? std::max(0.0f, this->show_messages_timer * 255)
+                                                 : 255);
+
+    int max_messages = 8;
+    auto pos = game->window_size().GetY() - 24;
+    for (auto it = this->messages.rbegin(); it != this->messages.rend(); ++it) {
+        auto message_texture = SDL2pp::Texture(
+                this->game->renderer,
+                this->game->chat_font->RenderText_Blended(*it, SDL2pp::Color{255, 255, 255, 255}));
+        message_texture.SetAlphaMod(alpha);
+        this->game->renderer.Copy(
+                message_texture,
+                SDL2pp::NullOpt,
+                SDL2pp::Rect(4, pos, message_texture.GetWidth(), message_texture.GetHeight()));
+
+        pos -= 24;
+        max_messages--;
+        if (max_messages == 0) {
+            break;
+        }
+    }
 }
 
 void MatchScene::handle_update() {
@@ -374,6 +407,8 @@ void MatchScene::handle_update() {
             break;
         case SERVER_MESSAGE:
             server_message.deserialize(span);
+            this->messages.push_back(server_message.message);
+            this->show_messages_timer = MESSAGE_SHOW_TIME;
             std::cerr << "SERVER MESSAGE: " << server_message.message << "\n";
             break;
         default:
@@ -495,12 +530,14 @@ void MatchScene::handle_explosion_update(ExplosionUpdate eu) {
 void MatchScene::handle_server_join_info(ServerJoinInfo sji) {
     this->player_ids.push_back(sji.player_id);
 
-    if (!reset) {
+    if (!this->reset) {
         return;
     }
     this->state = MATCH_SCENE_LOADING;
-    reset = false;
+    this->reset = false;
+    this->messages.emplace_back("---");
 
+    this->ships.clear();
     this->pickups.clear();
     this->projectiles.clear();
 
