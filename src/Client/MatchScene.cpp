@@ -326,7 +326,7 @@ void MatchScene::draw_messages(DeltaTime dt) {
         int x = 4;
         size_t offset = 0;
         size_t size = it->size();
-        auto *chars = new char[it->size()];
+        auto chars = new char[it->size() + 1];
         strcpy(chars, it->c_str());
         SDL2pp::Color color{255, 255, 255, 255};
         SDL2pp::Color next_color{255, 255, 255, 255};
@@ -364,7 +364,7 @@ void MatchScene::draw_messages(DeltaTime dt) {
             color = next_color;
         }
 
-        delete chars;
+        delete[] chars;
 
         pos -= 24;
         max_messages--;
