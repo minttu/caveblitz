@@ -94,6 +94,7 @@ private:
 
 public:
     uint8_t match_status;
+    float timeout = 0.0f;
 
     MatchServer();
     ~MatchServer() = default;
@@ -112,6 +113,8 @@ public:
     std::vector<std::shared_ptr<ServerPlayer>> get_players() const override;
     void set_winner(PlayerID player_id) override;
     void set_draw() override;
+    void send_message(std::string &msg) override;
+    void respawn(PlayerID player_id) override;
 };
 
 #endif // CAVEBLITZ_SERVER_MATCH_SERVER_H

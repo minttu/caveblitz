@@ -4,6 +4,15 @@
 static const int MAX_PLAYERS = 8;
 static const int MAX_PICKUPS = 64;
 
+const static std::string SHIP_NAMES[] = {"^0blue^r",
+                                         "^1red^r",
+                                         "^2yellow^r",
+                                         "^3purple^r",
+                                         "^4green^r",
+                                         "^5orange^r",
+                                         "^6aqua^r",
+                                         "^7pink^r"};
+
 MatchServer::MatchServer() : map(std::make_shared<Map>(Map("abstract"))) {
     this->dynamic_image = this->map->get_dynamic()->image();
     this->match_status = MATCH_WAITING;
@@ -91,22 +100,20 @@ void MatchServer::motd(const std::shared_ptr<std::vector<uint8_t>> &output) {
     ServerMessage server_message;
     std::stringstream ss;
     ss << "Welcome to caveblitz! ";
-    ss << "Playing on map: '";
-    ss << this->map->name;
-    ss << "' with game mode: '";
+    ss << "Playing ^6";
     ss << this->game_mode->get_name();
-    ss << "'";
+    ss << "^r on ^6";
+    ss << this->map->name;
+    ss << "^r";
     server_message.message = ss.str();
     server_message.serialize(output);
 }
 
 void MatchServer::frag_message(PlayerID fragger, PlayerID fragged) {
     std::stringstream ss;
-    ss << "'";
-    ss << std::to_string(fragger);
-    ss << "' fragged '";
-    ss << std::to_string(fragged);
-    ss << "'";
+    ss << gsl::at(SHIP_NAMES, fragger);
+    ss << " fragged ";
+    ss << gsl::at(SHIP_NAMES, fragged);
     this->messages.push_back(ss.str());
 }
 
@@ -258,6 +265,7 @@ void MatchServer::explode_projectile(std::shared_ptr<ServerProjectile> &prj, flo
             player->take_damage(prj->get_damage());
             if (player->health == 0) {
                 this->frag_message(prj->player_id, player->player_id);
+                this->game_mode->player_fragged(prj->player_id, player->player_id);
                 this->player_death_explosion(player);
             }
         }
@@ -379,6 +387,12 @@ void MatchServer::despawn_pickup(PickupID pickup_id) {
 }
 
 void MatchServer::update(float dt) {
+    if (this->timeout >= 0.0f) {
+        this->timeout -= dt;
+        this->messages.clear();
+        return;
+    }
+
     if (this->match_status != MATCH_PLAYING) {
         this->check_start();
         return;
@@ -437,7 +451,7 @@ void MatchServer::update(float dt) {
         this->pickups.erase(x);
     }
 
-    this->game_mode->match_tick(*this);
+    this->game_mode->match_tick(*this, dt);
 }
 
 void MatchServer::set_winner(PlayerID player_id) {
@@ -445,6 +459,11 @@ void MatchServer::set_winner(PlayerID player_id) {
 
     if (this->players.find(player_id) != this->players.end()) {
         this->players[player_id]->winner = true;
+
+        std::stringstream ss;
+        ss << gsl::at(SHIP_NAMES, player_id);
+        ss << " won";
+        this->messages.emplace_back(ss.str());
     }
 }
 
@@ -454,7 +473,7 @@ void MatchServer::set_draw() {
     this->spawned_pickups.clear();
     this->despawned_pickups.clear();
     this->explosions.clear();
-    this->messages.emplace_back("Match ended");
+    this->timeout = 5.0f;
 }
 
 void MatchServer::serialize(const std::shared_ptr<std::vector<uint8_t>> &target) const {
@@ -520,4 +539,19 @@ std::vector<std::shared_ptr<ServerPlayer>> MatchServer::get_players() const {
         ret.push_back(x.second);
     }
     return ret;
+}
+
+void MatchServer::send_message(std::string &msg) {
+    this->messages.push_back(msg);
+}
+
+void MatchServer::respawn(PlayerID player_id) {
+    auto x = this->players.find(player_id);
+    if (x == this->players.end()) {
+        return;
+    }
+
+    x->second->health = 100;
+    auto point = this->map->get_player_spawn(player_id);
+    x->second->position = glm::vec2(point->x, point->y);
 }

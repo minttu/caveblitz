@@ -45,7 +45,7 @@ void Server::run(const bool *should_run) {
     int connected_peers = 0;
 
     while (*should_run) {
-        if (match != nullptr && match->match_status == MATCH_ENDED) {
+        if (match != nullptr && match->match_status == MATCH_ENDED && match->timeout <= 0) {
             this->next_match();
         }
 

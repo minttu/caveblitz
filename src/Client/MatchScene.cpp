@@ -323,14 +323,46 @@ void MatchScene::draw_messages(DeltaTime dt) {
     int max_messages = 8;
     auto pos = game->window_size().GetY() - 24;
     for (auto it = this->messages.rbegin(); it != this->messages.rend(); ++it) {
-        auto message_texture = SDL2pp::Texture(
-                this->game->renderer,
-                this->game->chat_font->RenderText_Blended(*it, SDL2pp::Color{255, 255, 255, 255}));
-        message_texture.SetAlphaMod(alpha);
-        this->game->renderer.Copy(
-                message_texture,
-                SDL2pp::NullOpt,
-                SDL2pp::Rect(4, pos, message_texture.GetWidth(), message_texture.GetHeight()));
+        int x = 4;
+        int offset = 0;
+        int size = static_cast<int>(it->size());
+        char chars[it->size()];
+        strcpy(chars, it->c_str());
+        SDL2pp::Color color{255, 255, 255, 255};
+        SDL2pp::Color next_color{255, 255, 255, 255};
+
+        while (offset < it->size()) {
+            for (int i = offset; i < it->size(); i++, size = i - offset) {
+                if (chars[i] == '^') {
+                    if (chars[i + 1] == 'r') {
+                        next_color = SDL2pp::Color{255, 255, 255, 255};
+                    } else if (chars[i + 1] >= '0' && chars[i + 1] <= '7') {
+                        next_color = SHIP_COLORS[chars[i + 1] - '0'];
+                    }
+
+                    chars[i] = 0;
+                    chars[i + 1] = 0;
+                    size = i - offset;
+                    break;
+                }
+            }
+            if (strlen(chars + offset) != 0) {
+                auto message_texture =
+                        SDL2pp::Texture(this->game->renderer,
+                                        this->game->chat_font->RenderText_Blended(chars + offset,
+                                                                                  color));
+                message_texture.SetAlphaMod(alpha);
+                this->game->renderer.Copy(message_texture,
+                                          SDL2pp::NullOpt,
+                                          SDL2pp::Rect(x,
+                                                       pos,
+                                                       message_texture.GetWidth(),
+                                                       message_texture.GetHeight()));
+                x += message_texture.GetWidth();
+            }
+            offset += size + 2;
+            color = next_color;
+        }
 
         pos -= 24;
         max_messages--;
