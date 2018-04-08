@@ -397,6 +397,9 @@ void MatchScene::handle_player_update(PlayerUpdate pu) {
     ship->x = pu.x;
     ship->y = pu.y;
     ship->rotation = pu.rotation;
+    if (ship->health > pu.health) {
+        ship->damage_taken();
+    }
     ship->health = pu.health;
 }
 

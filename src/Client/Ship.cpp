@@ -2,13 +2,10 @@
 
 Ship::Ship(uint8_t player_id) {
     this->player_id = player_id;
-    this->x = 0.0f;
-    this->y = 0.0f;
-    this->rotation = 0.0f;
     this->color = gsl::at(SHIP_COLORS, player_id);
 }
 
-void Ship::draw(SDL2pp::Renderer *renderer, float /*unused*/) const {
+void Ship::draw(SDL2pp::Renderer *renderer, float dt) {
     if (this->health == 0) {
         return;
     }
@@ -20,7 +17,19 @@ void Ship::draw(SDL2pp::Renderer *renderer, float /*unused*/) const {
                       28);
 
     this->texture->SetBlendMode(SDL_BLENDMODE_BLEND);
-    this->texture->SetColorMod(this->color.r, this->color.g, this->color.b);
+
+    if (this->taken_damage_counter > 0.0f) {
+        this->taken_damage_counter -= dt * SHIP_TAKE_DAMAGE_FADE;
+        this->texture->SetColorMod(
+                static_cast<Uint8>(this->color.r +
+                                   (255 - this->color.r) * this->taken_damage_counter),
+                static_cast<Uint8>(this->color.g +
+                                   (255 - this->color.g) * this->taken_damage_counter),
+                static_cast<Uint8>(this->color.b +
+                                   (255 - this->color.b) * this->taken_damage_counter));
+    } else {
+        this->texture->SetColorMod(this->color.r, this->color.g, this->color.b);
+    }
     renderer->Copy(*this->texture, src_rect, rect, this->rotation, SDL2pp::NullOpt, SDL_FLIP_NONE);
 
     const int dot_size = 2;
@@ -32,4 +41,8 @@ void Ship::draw(SDL2pp::Renderer *renderer, float /*unused*/) const {
 
     this->texture->SetColorMod(255, 255, 255);
     renderer->Copy(*this->texture, dot_src_rect, dot_dst_rect);
+}
+
+void Ship::damage_taken() {
+    this->taken_damage_counter = SHIP_TAKE_DAMAGE_TIME;
 }
