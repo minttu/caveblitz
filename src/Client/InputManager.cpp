@@ -45,45 +45,46 @@ void InputManager::player_inputs(std::vector<Input> *inputs) {
 }
 
 Input InputManager::keyboard_input(const SDL_Scancode layout[6]) {
-    Input playerInput{};
+    Input input{};
 
-    playerInput.up = this->keys_held[layout[0]];
-    playerInput.down = this->keys_held[layout[1]];
-    playerInput.right = this->keys_held[layout[2]];
-    playerInput.left = this->keys_held[layout[3]];
+    input.up = this->keys_held[layout[0]];
+    input.down = this->keys_held[layout[1]];
+    input.right = this->keys_held[layout[2]];
+    input.left = this->keys_held[layout[3]];
 
-    playerInput.thrust = static_cast<int8_t>(playerInput.up * 127);
-    playerInput.rotation = static_cast<int8_t>(playerInput.left * 127 - playerInput.right * 127);
+    input.thrust = static_cast<int8_t>(input.up * 127);
+    input.rotation = static_cast<int8_t>(input.left * 127 - input.right * 127);
 
-    playerInput.primary = this->keys_held[layout[4]];
-    playerInput.special = this->keys_held[layout[5]];
-    playerInput.back = this->keys_held[SDL_SCANCODE_BACKSPACE];
+    input.primary = this->keys_held[layout[4]];
+    input.special = this->keys_held[layout[5]];
+    input.back = this->keys_held[SDL_SCANCODE_BACKSPACE];
 
-    return playerInput;
+    return input;
 }
 
 Input InputManager::controller_input(SDL_GameController *controller) {
-    Input playerInput{};
+    Input input{};
 
-    playerInput.up = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP);
-    playerInput.down = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-    playerInput.right = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-    playerInput.left = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+    input.up = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP);
+    input.down = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+    input.right = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+    input.left = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
 
-    playerInput.thrust = static_cast<int8_t>(
+    input.thrust = static_cast<int8_t>(
             SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A) * 127);
-    playerInput.rotation = static_cast<int8_t>(
-            SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX) / 256);
+    input.rotation = -static_cast<int8_t>(
+            SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX) / 257);
+    if (std::abs(input.rotation) < 20) {
+        input.rotation = 0;
+    }
 
-    playerInput.primary =
-            SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X) |
-            SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
-    playerInput.special =
-            SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y) |
-            SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
-    playerInput.back = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B);
+    input.primary = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X) |
+                    SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+    input.special = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y) |
+                    SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+    input.back = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B);
 
-    return playerInput;
+    return input;
 }
 
 bool InputManager::keyboard_activate(const SDL_Scancode layout[6]) {
